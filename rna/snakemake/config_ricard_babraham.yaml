@@ -1,0 +1,377 @@
+
+######################
+## Global variables ##
+######################
+
+samples: ["E7.5_rep1", "E7.5_rep2", "E7.75_rep1", "E8.0_rep1", "E8.0_rep2", "E8.5_rep1", "E8.5_rep2", "E8.75_rep1", "E8.75_rep2", "E8.5_CRISPR_T_KO", "E8.5_CRISPR_T_WT"]
+reference_samples: ["E7.5_rep1", "E7.5_rep2", "E7.75_rep1", "E8.0_rep1", "E8.0_rep2", "E8.5_rep1", "E8.5_rep2", "E8.75_rep1", "E8.75_rep2"]
+wt_ko_samples: ["E8.5_CRISPR_T_KO", "E8.5_CRISPR_T_WT"]
+celltypes: ["Epiblast", "Primitive_Streak", "Caudal_epiblast", "PGC", "Anterior_Primitive_Streak", "Notochord", "Def._endoderm", "Gut", "Nascent_mesoderm", "Mixed_mesoderm", "Intermediate_mesoderm", "Caudal_Mesoderm", "Paraxial_mesoderm", "Somitic_mesoderm", "Pharyngeal_mesoderm", "Cardiomyocytes", "Allantois", "ExE_mesoderm", "Mesenchyme", "Haematoendothelial_progenitors", "Endothelium", "Blood_progenitors_1", "Blood_progenitors_2", "Erythroid1", "Erythroid2", "Erythroid3", "NMP", "Rostral_neurectoderm", "Caudal_neurectoderm", "Neural_crest", "Forebrain_Midbrain_Hindbrain", "Spinal_cord", "Surface_ectoderm", "Visceral_endoderm", "ExE_endoderm", "ExE_ectoderm", "Parietal_endoderm"]
+stages: ["E7.5","E7.75","E8.0","E8.5","E8.75"]
+trajectories: ["nmp"]
+
+#################
+## Directories ##
+#################
+
+directories:
+    base: /bi/group/reik/ricard/data/gastrulation_multiome_10x
+    original_data: /bi/group/reik/ricard/data/gastrulation_multiome_10x/original
+    processed_data: /bi/group/reik/ricard/data/gastrulation_multiome_10x/test/processed/rna
+    results: /bi/group/reik/ricard/data/gastrulation_multiome_10x/test/results
+    # processed_data: /bi/group/reik/ricard/data/gastrulation_multiome_10x/processed/rna
+    # results: /bi/group/reik/ricard/data/gastrulation_multiome_10x/results
+    atlas: /bi/group/reik/ricard/data/pijuansala2019_gastrulation10x
+
+###############
+## Resources ##
+###############
+
+resources:
+    python: /bi/group/reik/ricard/software/miniconda3/envs/main/bin/python
+    # marker_genes: /bi/group/reik/ricard/data/pijuansala2019_gastrulation10x/results/marker_genes/all_stages/marker_genes.txt.gz
+    # TFs_file: "/bi/group/reik/ricard/data/mm10_regulation/TFs/TFs.txt"
+    TFs_file: "/bi/group/reik/ricard/data/mm10_regulation/TFs/TFs.txt"
+    cell_metadata: "/bi/group/reik/ricard/data/gastrulation_multiome_10x/results/atac/archR/celltype_assignment/sample_metadata_after_celltype_assignment.txt.gz"
+    mm10_mask: /bi/group/reik/ricard/data/mm10_sequence/repeats/mm10_rmsk.gtf
+    genes_gtf: /bi/scratch/Stephen_Clark/annotations/gtf/Mus_musculus.GRCm38.98.gtf
+
+#############
+## Scripts ##
+#############
+
+scripts:
+    # basic processing
+    create_seurat: ../processing/1_create_seurat_rna.R
+    qc: ../processing/2_QC.R
+    seurat_to_sce: ../processing/3_seurat_to_SCE.R
+    doublet_detection: ../processing/4_doublet_detection.R
+    parse_doublets: ../processing/5_parse_sample_metadata_after_doublets.R
+    plot_stats_per_sample: ../processing/6_plot_stats.R
+    convert_SingleCellExperiment_to_anndata: ../conversions/convert_SingleCellExperiment_to_anndata.R
+
+    # mapping
+    mapping_mnn: ../mapping/run/mnn/mapping_mnn.R
+    mapping_seurat: ../mapping/run/seurat/mapping_seurat.R
+    parse_mapping: ../mapping/run/parse_sample_metadata_after_mapping.R
+
+    # dimensionality reduction
+    dimensionality_reduction_sce: ../dimensionality_reduction/dimensionality_reduction_sce.R
+    dimensionality_reduction_seurat: ../dimensionality_reduction/dimensionality_reduction_seurat.R
+
+    # pseudobulk
+    pseudobulk_rna: ../pseudobulk/pseudobulk_rna.R
+    pseudobulk_rna_with_replicates: ../pseudobulk/pseudobulk_rna_with_replicates.R
+
+    # cell type validation
+    celltype_validation_single_cells: ../celltype_validation/celltype_validation_single_cells.R
+    celltype_validation_pseudobulk: ../celltype_validation/celltype_validation_pseudobulk.R
+
+    # mapping
+    plot_mapping_results: ../mapping/analysis/plot_mapping_umap.R
+    plot_celltype_proportions: ../celltype_proportions/plot_celltype_proportions.R
+
+    # TF2gene coexpression
+    infer_trajectories: ../trajectories/infer_trajectory.R
+    coexpression_TF_vs_gene_single_cells: ../TF2gene_coexpression/coexpression_TF_vs_gene_single_cells.R
+    coexpression_TF_vs_gene_pseudobulk: ../TF2gene_coexpression/coexpression_TF_vs_gene_pseudobulk.R
+
+    # metacells
+    run_metacells: ../metacells/run/run_metacell.py
+    run_metacells_trajectory: ../metacells/run/run_metacell_trajectory.py
+    aggregate_rna_metacells: ../metacells/run/aggregate_rna_metacell.R
+    coexpression_TF_vs_gene_metacells: ../TF2gene_coexpression/coexpression_TF_vs_gene_metacells.R
+
+    # differential expression between cell types
+    differential_celltype_cells: ../differential/cells/differential.R
+    differential_celltype_metacells: ../differential/metacells/differential.R
+    differential_celltype_pseudobulk: ../differential/pseudobulk/celltype/differential_celltype_pseudobulk.R
+
+    # differential expression between genotypes
+    # differential_genotype_cells: ../differential/cells/genotype/run_diff_expr_genotype.R
+    # differential_genotype_metacells: ../differential/metacells/genotype/run_diff_expr_genotype.R
+    differential_celltype_genotype_pseudobulk: ../differential/pseudobulk/celltype_genotype/differential_celltype_genotype_pseudobulk.R
+
+    # parse differential expression results
+    parse_differential_celltype_cells: ../differential/cells/parse_differential_results.R
+    parse_differential_celltype_metacells: ../differential/metacells/parse_differential_results.R
+    parse_differential_celltype_pseudobulk: ../differential/pseudobulk/celltype/parse_differential_results.R
+    parse_differential_celltype_genotype_pseudobulk: ../differential/pseudobulk/celltype_genotype/parse_differential_results.R
+
+
+    # extract TFs from differential results
+    differential_extract_TFs: ../differential/other/extract_TFs_diff.R
+
+    # Marker genes
+    define_marker_genes_cells: ../differential/cells/celltype/analysis/define_marker_genes.R
+    define_marker_genes_metacells: ../differential/metacells/celltype/analysis/define_marker_genes.R
+    define_marker_genes_pseudobulk: ../differential/pseudobulk/celltype/analysis/define_marker_genes.R
+    define_marker_TFs_cells: ../differential/cells/celltype/analysis/TFs/define_marker_TFs.R
+    define_marker_TFs_metacells: ../differential/metacells/celltype/analysis/TFs/define_marker_TFs.R
+    define_marker_TFs_pseudobulk: ../differential/pseudobulk/celltype/analysis/define_marker_TFs.R
+
+    # Extract TFs
+    extract_TF_SingleCellExperiment: ../processing/extract_TFs_from_SingleCellExperiment.R
+
+    # Velocity
+    create_anndata_velocyto: ../scanpy/velocyto/create_anndata_from_loom_files.py
+
+
+################
+## Parameters ##
+################
+
+pseudobulk_rna:
+    # group_by: ["sample", "celltype_mnn", "celltype_seurat"]
+    group_by: ["celltype", "sample", "celltype_genotype"]
+    normalisation_method: "cpm"
+    
+pseudobulk_rna_with_replicates:
+    nrep: 5
+    min_cells: 25
+    fraction_cells_per_replicate: 0.30
+
+doublet_detection:
+    doublet_score_threshold: 1.25
+
+mapping_mnn:
+    atlas_stages: ["E6.5","E6.75","E7.0","E7.25","E7.5","E7.75","E8.0","E8.25","E8.5"]
+    npcs: 50
+    n_neighbours: 25
+
+mapping_seurat:
+    atlas_stages: ["E6.5","E6.75","E7.0","E7.25","E7.5","E7.75","E8.0","E8.25","E8.5"]
+    npcs: 50
+    n_neighbours: 25
+
+qc:
+    min_nFeature_RNA: 2000
+    max_nFeature_RNA: 10000
+    percent_mt: 40
+    percent_rib: 20
+
+dimensionality_reduction_sce:
+    npcs: 50
+    features: 2500
+    n_neighbors: 25
+    min_dist: 0.5
+    vars_to_regress: ["nFeature_RNA"]
+    batch_variable: ["sample","None"]
+    remove_ExE_cells: ["True","False"]
+    # colour_by: ["sample", "stage", "celltype_mnn", "celltype_seurat", "doublet_score", "doublet_call", "nFeature_RNA"]
+    colour_by: ["sample", "stage", "celltype", "nFeature_RNA"]
+
+dimensionality_reduction_seurat:
+    npcs: 50
+    features: 2500
+    n_neighbors: 25
+    min_dist: 0.5
+    seed: 42
+    vars_to_regress: ["nFeature_RNA"]
+    batch_variable: ["sample"]
+    remove_ExE_cells: ["True","False"]
+    # vars_to_regress: ["nFeature_RNA","mitochondrial_percent_RNA"]
+    colour_by: ["sample", "stage", "celltype", "nFeature_RNA"]
+
+celltype_validation_single_cells:
+    celltype_label: "celltype"
+
+celltype_validation_pseudobulk:
+    celltype_label: "celltype"
+
+plot_celltype_proportions:
+    celltype_label: "celltype"
+
+infer_trajectories:
+    # trajectory_name: ["blood", "ectoderm", "endoderm", "mesoderm"]
+    trajectory_name: ["blood"]
+    celltype_label: "celltype"
+
+# coexpression_TF_vs_gene_trajectories
+
+run_metacells:
+    percent_metacells: 0.05
+    n_features: 1500
+    n_pcs: 25
+
+run_metacells_trajectory:
+    percent_metacells: 0.05
+    n_features: 1500
+    n_pcs: 15
+    trajectories: ["nmp"]
+
+aggregate_rna_metacells:
+    metacell_min_reads: 25000
+    normalisation_method: "cpm"
+
+differential_celltype_cells:
+    group_variable: ["celltype"]
+    min_cells: 25
+
+differential_celltype_metacells:
+    group_variable: ["celltype"]
+    min_cells: 5
+
+differential_genotype_metacells:
+    group_variable: ["genotype"]
+    min_cells: 5
+
+differential_genotype_pseudobulk:
+    min_cells: 50
+
+differential_genotype:
+    group_variable: ["genotype"]
+    ko_class: "T_KO"
+    wt_class: "WT"
+    min_cells: 50
+
+tf2gene_cor:
+    cor_test: ["pearson","spearman"]
+
+define_marker_genes:
+    min_fold_change: 1.0
+    min_score: 0.85
+    fdr: 0.01
+
+define_marker_TFs:
+    min_fold_change: 1.0
+    min_score: 0.85
+    fdr: 0.01
+
+###########
+## Slurm ##
+###########
+
+slurm:  # memory in MB
+    create_seurat: 
+        memory: 50000
+        threads: 1
+    qc: 
+        memory: 3000
+        threads: 1
+    seurat_to_sce:
+        memory: 50000
+        threads: 1
+    doublet_detection:
+        memory: 25000
+        threads: 1
+    parse_doublet_results:
+        memory: 2000
+        threads: 1
+    plot_stats_per_sample:
+        threads: 1
+        memory: 15000
+    pseudobulk_rna:
+        memory: 15000
+        threads: 1
+    pseudobulk_rna_with_replicates:
+        memory: 25000
+        threads: 1
+    mapping_mnn:
+        memory: 50000
+        threads: 1
+    mapping_mnn_all_samples:
+        memory: 50000
+        threads: 1
+    mapping_seurat:
+        memory: 150000
+        threads: 1
+    mapping_seurat_all_samples:
+        memory: 150000
+        threads: 1
+    parse_mapping_results:
+        memory: 2000
+        threads: 1
+    dimensionality_reduction_sce:
+        memory: 20000
+        threads: 1
+    dimensionality_reduction_seurat:
+        memory: 70000
+        threads: 1
+    dimensionality_reduction_seurat_per_stage:
+        memory: 30000
+        threads: 1
+    celltype_validation_single_cells:
+        memory: 15000
+        threads: 1
+    celltype_validation_pseudobulk:
+        memory: 3000
+        threads: 1
+    plot_mapping_results:
+        memory: 3000
+        threads: 1
+    plot_celltype_proportions:
+        memory: 3000
+        threads: 1
+    infer_trajectories:
+        memory: 10000
+        threads: 1
+    coexpression_TF_vs_gene_single_cells:
+        memory: 80000
+        threads: 1
+    coexpression_TF_vs_gene_single_cells_denoised:
+        memory: 220000
+        threads: 1
+    coexpression_TF_vs_gene_pseudobulk:
+        memory: 5000
+        threads: 1
+    convert_SingleCellExperiment_to_anndata:
+        memory: 45000
+        threads: 1
+    run_metacells:
+        threads: 1
+        memory: 25000
+    run_metacells_trajectory:
+        threads: 1
+        memory: 15000
+    aggregate_rna_metacells:
+        threads: 1
+        memory: 15000
+    coexpression_TF_vs_gene_metacells:
+        threads: 1
+        memory: 15000
+    samtools_sort:
+        threads: 8
+        memory: 50000
+    run_velocyto:
+        threads: 8
+        memory: 50000
+    differential_cells:
+        threads: 1
+        memory: 10000
+    differential_metacells:
+        threads: 1
+        memory: 5000
+    differential_pseudobulk:
+        threads: 1
+        memory: 3000
+    parse_differential_celltype:
+        threads: 1
+        memory: 15000
+    differential_celltype_pseudobulk:
+        threads: 1
+        memory: 7000
+    differential_genotype_pseudobulk:
+        threads: 1
+        memory: 7000
+    differential_celltype_extract_TFs:
+        threads: 1
+        memory: 7000
+    extract_TF_SingleCellExperiment_cells:
+        threads: 1
+        memory: 20000
+    extract_TF_SingleCellExperiment_metacells:
+        threads: 1
+        memory: 15000
+    extract_TF_SingleCellExperiment_pseudobulk:
+        threads: 1
+        memory: 8000
+    define_marker_genes:
+        threads: 1
+        memory: 10000
+    define_marker_TFs:
+        threads: 1
+        memory: 5000
+    create_anndata_velocyto:
+        threads: 1
+        memory: 30000

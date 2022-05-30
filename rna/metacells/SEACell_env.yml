@@ -1,0 +1,35 @@
+# https://github.com/dpeerlab/SEACells
+
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - scanpy=1.8.2
+  - loompy=3.0.6
+  - jupyter
+  - louvain
+  - python-igraph
+  - louvain>=0.6,!=0.6.2
+  - leidenalg
+  # - harmonypy
+  # - scanorama
+  - seaborn
+  - cython
+  - pyranges
+  - pip
+  - pip:
+    - dfply
+    # - palantir
+    # - PhenoGraph
+
+
+# commands:
+# conda create -n metacells python==3.9 --yes
+# conda activate metacells
+# conda install mamba --yes
+# mamba env update -n metacells --file SEACell_env.yml
+# pip install git+https://github.com/settylab/Palantir@removeTSNE
+# python setup.py develop # inside SEACells
+
+
+# mamba remove -n metacells --all

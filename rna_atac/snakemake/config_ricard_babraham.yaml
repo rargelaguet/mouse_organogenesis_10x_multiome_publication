@@ -1,0 +1,270 @@
+
+######################
+## Global variables ##
+######################
+
+samples: ["E7.5_rep1", "E7.5_rep2", "E7.75_rep1", "E8.0_rep1", "E8.0_rep2", "E8.5_rep1", "E8.5_rep2", "E8.75_rep1", "E8.75_rep2", "E8.5_CRISPR_T_KO", "E8.5_CRISPR_T_WT"]
+reference_samples: ["E7.5_rep1", "E7.5_rep2", "E7.75_rep1", "E8.0_rep1", "E8.0_rep2", "E8.5_rep1", "E8.5_rep2", "E8.75_rep1", "E8.75_rep2"]
+wt_ko_samples: ["E8.5_CRISPR_T_KO", "E8.5_CRISPR_T_WT"]
+celltypes: ["Epiblast", "Primitive_Streak", "Caudal_epiblast", "PGC", "Anterior_Primitive_Streak", "Notochord", "Def._endoderm", "Gut", "Nascent_mesoderm", "Mixed_mesoderm", "Intermediate_mesoderm", "Caudal_Mesoderm", "Paraxial_mesoderm", "Somitic_mesoderm", "Pharyngeal_mesoderm", "Cardiomyocytes", "Allantois", "ExE_mesoderm", "Mesenchyme", "Haematoendothelial_progenitors", "Endothelium", "Blood_progenitors_1", "Blood_progenitors_2", "Erythroid1", "Erythroid2", "Erythroid3", "NMP", "Rostral_neurectoderm", "Caudal_neurectoderm", "Neural_crest", "Forebrain_Midbrain_Hindbrain", "Spinal_cord", "Surface_ectoderm", "Visceral_endoderm", "ExE_endoderm", "ExE_ectoderm", "Parietal_endoderm"]
+stages: ["E7.5","E7.75","E8.0","E8.5","E8.75"]
+trajectories: ["nmp"]
+motif_annotations: ["CISBP","JASPAR"]
+
+#################
+## Directories ##
+#################
+
+directories:
+    base: /bi/group/reik/ricard/data/gastrulation_multiome_10x
+    original_data: /bi/group/reik/ricard/data/gastrulation_multiome_10x/original
+    processed_data: /bi/group/reik/ricard/data/gastrulation_multiome_10x/test/processed/atac/archR
+    results: /bi/group/reik/ricard/data/gastrulation_multiome_10x/test/results
+        
+#############
+## Scripts ##
+#############
+
+scripts:
+    # Gene expression vs promoter accessibility
+    run_gene_expr_vs_promoter_acc_pseudobulk: ../rna_vs_acc/pseudobulk/gene_expr_vs_promoter_acc/cor_gene_expr_vs_promoter_acc_pseudobulk.R
+    run_gene_expr_vs_promoter_acc_metacells: ../rna_vs_acc/metacells/gene_expr_vs_promoter_acc/cor_gene_expr_vs_promoter_acc_metacells.R
+    plot_gene_expr_vs_promoter_acc_pseudobulk: ../rna_vs_acc/pseudobulk/gene_expr_vs_promoter_acc/plot_gene_expr_vs_promoter_acc_pseudobulk.R
+
+    # Gene expression vs peak accessibility
+    run_gene_expr_vs_peak_acc_pseudobulk: ../rna_vs_acc/pseudobulk/gene_expr_vs_peak_acc/cor_gene_expr_vs_peak_acc_pseudobulk.R
+    plot_gene_expr_vs_peak_acc_pseudobulk: ../rna_vs_acc/pseudobulk/gene_expr_vs_peak_acc/plot_gene_expr_vs_peak_acc_pseudobulk.R
+    # tf_expr_vs_peak_accessibility_trajectory: ../rna_vs_acc/trajectories/run_TFexpr_vs_peakAcc_trajectories.R
+
+    # TF expression vs chromVAR
+    cor_rna_vs_chromvar_per_gene_pseudobulk: ../rna_vs_chromvar/pseudobulk/per_gene/cor_rna_vs_chromvar_per_gene_pseudobulk.R
+    plot_rna_vs_chromvar_per_gene_pseudobulk: ../rna_vs_chromvar/pseudobulk/per_gene/plot_rna_vs_chromvar_per_gene_pseudobulk.R
+    rna_vs_chromvar_per_celltype_pseudobulk: ../rna_vs_chromvar/pseudobulk/per_celltype/rna_vs_chromvar_pseudobulk_per_celltype.R
+    run_tf_expr_vs_peak_accessibility_pseudobulk: ../rna_vs_acc/pseudobulk/TFexpr_vs_peakAcc/run_cor_TFexpr_vs_peakAcc_pseudobulk.R
+
+    # ???
+    tf_expr_vs_peak_accessibility_metacells: ../rna_vs_acc/metacells/TFexpr_vs_peakAcc/run_cor_TFexpr_vs_peakAcc_metacells.R
+
+    # Virtual ChIP-seq
+    create_virtual_chip_pseudobulk: ../virtual_chipseq_library/pseudobulk/create_virtual_chipseq_library_pseudobulk.R
+    create_virtual_chip_metacells: ../virtual_chipseq_library/metacells/create_virtual_chipseq_library_metacells.R
+    tf2gene_after_virtual_chip: ../virtual_chipseq_library/link_TF2genes_virtual_chip.R
+
+    # MOFA
+    # run_mofa: ../mofa/run_mofa_rna_peaks.R
+    prepare_mofa: ../mofa/prepare_mofa.R
+    run_mofa: ../mofa/run.py
+    run_mofa_fast: ../mofa/run_mofa_fast.R
+    plot_mofa_results: ../mofa/plot_mofa_results.R
+
+    # chromVAR-ChIP
+    run_chromvar_chip: ../../atac/archR/chromvar_chip/run_chromvar_chip.R
+    run_chromvar_chip_cells: ../../atac/archR/chromvar_chip/cells/run_chromvar_chip.R
+
+    # differential chromVAR-ChIP
+    differential_chromvar_chip_celltypes_pseudobulk: ../../atac/archR/chromvar_chip/pseudobulk/differential/celltype/differential_chromvar_pseudobulk.R
+    # run_differential_chromvar_chip_celltypes_metacells: ../../atac/archR/chromvar_chip/metacells/differential/celltype/run_diff_chromvar_chip_celltype_metacells.R
+    parse_differential_celltype_pseudobulk:  ../../atac/archR/chromvar_chip/pseudobulk/differential/celltype/parse_differential_results.R
+
+    # define celltype TF markers using chromVAR-ChIP results
+    define_markers_chromvar_chip: ../../atac/archR/chromvar_chip/pseudobulk/differential/celltype/analysis/define_markers.R
+    
+    # RNA vs ChromVAR-ChIP
+    rna_vs_chromvar_chip_per_gene_pseudobulk: ../rna_vs_chromvar_chip/pseudobulk/per_gene/rna_vs_chromvar_per_gene_pseudobulk.R
+    rna_vs_chromvar_chip_per_celltype_pseudobulk: ../rna_vs_chromvar_chip/pseudobulk/per_celltype/rna_vs_chromvar_pseudobulk_per_celltype.R
+    # rna_vs_chromvar_chip_trajectory: ../rna_vs_chromvar_chip/trajectories/rna_vs_chromvar_trajectory.R
+
+###############
+## Resources ##
+###############
+
+resources:
+    cell_metadata: /bi/group/reik/ricard/data/gastrulation_multiome_10x/test/results/atac/archR/celltype_assignment/sample_metadata_after_celltype_assignment.txt.gz
+    metacells_metadata: /bi/group/reik/ricard/data/gastrulation_multiome_10x/test/results/atac/archR/metacells/all_cells/PeakMatrix/metacells_metadata.txt.gz
+    sce_rna_cells: /bi/group/reik/ricard/data/gastrulation_multiome_10x/processed/rna/SingleCellExperiment.rds
+    sce_rna_pseudobulk: /bi/group/reik/ricard/data/gastrulation_multiome_10x/test/results/rna/pseudobulk/celltype/SingleCellExperiment_pseudobulk.rds
+    sce_rna_pseudobulk_with_replicates: /bi/group/reik/ricard/data/gastrulation_multiome_10x/test/results/rna/pseudobulk/celltype/SingleCellExperiment_pseudobulk_with_replicates.rds
+    sce_rna_tfs_pseudobulk: /bi/group/reik/ricard/data/gastrulation_multiome_10x/test/results/rna/pseudobulk/celltype/SingleCellExperiment_TFs_pseudobulk.rds
+    sce_rna_metacells: /bi/group/reik/ricard/data/gastrulation_multiome_10x/test/results/rna/metacells/all_cells/SingleCellExperiment_metacells.rds
+    sce_rna_tfs_metacells: /bi/group/reik/ricard/data/gastrulation_multiome_10x/test/results/rna/metacells/all_cells/SingleCellExperiment_TFs_metacells.rds
+    sce_rna_metacells_trajectory:
+        nmp: /bi/group/reik/ricard/data/gastrulation_multiome_10x/test/results/rna/metacells/trajectories/nmp/SingleCellExperiment_metacells.rds
+    atac_feature_stats: /bi/group/reik/ricard/data/gastrulation_multiome_10x/test/results/atac/archR/feature_stats/PeakMatrix/PeakMatrix_celltype_stats.txt.gz
+    atac_background_peaks: /bi/group/reik/ricard/data/gastrulation_multiome_10x/test/processed/atac/archR/Background-Peaks.rds
+    atac_peak_metadata: /bi/group/reik/ricard/data/gastrulation_multiome_10x/processed/atac/archR/PeakCalls/peak_metadata.tsv.gz
+    atac_peak_matrix_cells: /bi/group/reik/ricard/data/gastrulation_multiome_10x/test/processed/atac/archR/Matrices/PeakMatrix_summarized_experiment.rds
+    atac_peak_matrix_pseudobulk: /bi/group/reik/ricard/data/gastrulation_multiome_10x/test/results/atac/archR/pseudobulk/celltype/PeakMatrix/pseudobulk_PeakMatrix_summarized_experiment.rds
+    atac_peak_matrix_pseudobulk_with_replicates: /bi/group/reik/ricard/data/gastrulation_multiome_10x/test/results/atac/archR/pseudobulk/celltype/PeakMatrix/PeakMatrix_pseudobulk_with_replicates.rds
+    atac_peak_matrix_metacells: /bi/group/reik/ricard/data/gastrulation_multiome_10x/test/results/atac/archR/metacells/all_cells/PeakMatrix/PeakMatrix_summarized_experiment_metacells.rds
+    atac_peak_matrix_metacells_trajectory: 
+        nmp: /bi/group/reik/ricard/data/gastrulation_multiome_10x/test/results/atac/archR/metacells/trajectories/nmp/PeakMatrix/PeakMatrix_summarized_experiment_metacells.rds
+    atac_gene_score_matrix_cells: /bi/group/reik/ricard/data/gastrulation_multiome_10x/test/processed/atac/archR/Matrices/GeneScoreMatrix_TSS_summarized_experiment.rds
+    atac_gene_score_matrix_metacells: /bi/group/reik/ricard/data/gastrulation_multiome_10x/test/results/atac/archR/metacells/all_cells/GeneScoreMatrix_TSS/GeneScoreMatrix_TSS_summarized_experiment_metacells.rds
+    atac_gene_score_matrix_pseudobulk: /bi/group/reik/ricard/data/gastrulation_multiome_10x/test/results/atac/archR/pseudobulk/celltype/GeneScoreMatrix_TSS/pseudobulk_GeneScoreMatrix_TSS_summarized_experiment.rds
+    tf_markers: /bi/group/reik/ricard/data/gastrulation_multiome_10x/test/results/rna/differential/metacells/celltype/TFs/marker_TFs_all.txt.gz
+    # cell2metacell: /bi/group/reik/ricard/data/gastrulation_multiome_10x/processed/rna/SingleCellExperiment.rds
+    rna_dimred: /bi/group/reik/ricard/data/gastrulation_multiome_10x/test/results/rna/dimensionality_reduction/sce/batch_correction_sample_remove_ExE_cells_False/pca_features2500_pcs50.txt.gz
+    atac_dimred: /bi/group/reik/ricard/data/gastrulation_multiome_10x/test/results/atac/archR/dimensionality_reduction/cells/PeakMatrix/remove_ExE_cells_False/batch_correction_None/lsi_nfeatures25000_ndims50.txt.gz
+    peak2gene_all: /bi/group/reik/ricard/data/gastrulation_multiome_10x/test/results/atac/archR/peak_calling/peaks2genes/peaks2genes_all.txt.gz
+    genome: mm10
+    python: /bi/group/reik/ricard/software/miniconda3/envs/main/bin/python
+
+        
+
+################
+## Parameters ##
+################
+
+rna_vs_chromvar_per_gene_pseudobulk:
+    # motif_annotation: ["CISBP"]
+    motif_annotation: ["JASPAR", "CISBP"]
+
+rna_vs_chromvar_per_celltype_pseudobulk:
+    # motif_annotation: ["CISBP"]
+    motif_annotation: ["JASPAR", "CISBP"]
+
+tf_expr_vs_peak_accessibility:
+    motif_annotation: ["CISBP","JASPAR"]
+
+run_gene_expr_vs_peak_acc_pseudobulk:
+    distance: 50000
+
+create_virtual_chip_pseudobulk:
+    motif_annotation: ["JASPAR", "CISBP"]
+    min_number_peaks: 50
+    min_peak_score: 15
+
+create_virtual_chip_metacells:
+    motif_annotation: ["JASPAR", "CISBP"]
+    min_number_peaks: 50
+    min_peak_score: 15
+    trajectories: ["nmp"]
+
+prepare_mofa:
+    nfeatures_atac: 25000
+    nfeatures_rna: 3000
+    remove_ExE_cells: ["True", "False"]
+    # atac_matrix: ["PeakMatrix"]
+
+run_mofa:
+    convergence_mode: "fast"
+    factors: 30
+    seed: 42
+
+run_mofa_fast:
+    factors: 30
+    seed: 42
+
+plot_mofa_results:
+    batch_correction: ["True","False"]
+
+tf_expr_vs_peak_accessibility_trajectory:
+    trajectory_name: ["blood"]
+    motif_annotation: ["JASPAR", "CISBP"]
+
+run_chromvar_chip:
+    min_number_peaks: 30
+    min_chip_score: 0.15
+
+rna_vs_chromvar_chip_trajectory:
+    knn: 50
+    trajectory_name: ["blood"]
+
+define_markers_chromvar_chip:
+    min_diff: 15
+    min_score: 0.85
+    fdr: 0.01
+
+# plot_rna_vs_chromvar_chip_per_celltype_pseudobulk:
+
+tf2gene_after_virtual_chip:
+    distance: 50000
+    min_chip_score: 0.15
+
+run_differential_chromvar_chip_celltypes_metacells:
+    min_cells: 5
+
+###########
+## Slurm ##
+###########
+
+slurm:  # memory in MB
+    run_gene_expr_vs_promoter_acc_pseudobulk:
+        threads: 1
+        memory: 5000
+    run_gene_expr_vs_promoter_acc_metacells:
+        threads: 1
+        memory: 15000
+    plot_gene_expr_vs_promoter_acc_pseudobulk:
+        threads: 1
+        memory: 5000
+    run_gene_expr_vs_peak_acc_pseudobulk:
+        threads: 1
+        memory: 10000
+    plot_gene_expr_vs_peak_acc_pseudobulk:
+        threads: 1
+        memory: 5000
+    rna_vs_chromvar_per_gene_pseudobulk: 
+        threads: 1
+        memory: 5000
+    rna_vs_chromvar_per_celltype_pseudobulk:
+        threads: 1
+        memory: 5000
+    cor_gene_expr_vs_promoter_acc_pseudobulk:
+        threads: 1
+        memory: 5000
+    tf_expr_vs_peak_accessibility:
+        threads: 1
+        memory: 15000
+    create_virtual_chip_pseudobulk:
+        threads: 1
+        memory: 15000
+    create_virtual_chip_metacells:
+        threads: 1
+        memory: 30000
+    prepare_mofa:
+        threads: 1
+        memory: 40000
+    run_mofa:
+        threads: 2
+        memory: 60000
+    run_mofa_fast:
+        threads: 2
+        memory: 15000
+    plot_mofa_results:
+        threads: 1
+        memory: 5000
+    tf_expr_vs_peak_accessibility_trajectory:
+        threads: 1
+        memory: 18000
+    tf_expr_vs_peak_accessibility_metacells:
+        threads: 1
+        memory: 25000
+    run_chromvar_chip_pseudobulk:
+        threads: 1
+        memory: 30000
+    run_chromvar_chip_metacells:
+        threads: 1
+        memory: 50000
+    run_chromvar_chip_cells:
+        threads: 1
+        memory: 50000
+    rna_vs_chromvar_chip_per_gene_pseudobulk:
+        threads: 1
+        memory: 5000
+    rna_vs_chromvar_chip_per_celltype_pseudobulk:
+        threads: 1
+        memory: 5000
+    tf2gene_after_virtual_chip:
+        threads: 1
+        memory: 15000
+    differential_chromvar:
+        threads: 1
+        memory: 8000
+    parse_differential_chromvar:
+        threads: 1
+        memory: 18000
+    define_markers_chromvar_chip:
+        threads: 1
+        memory: 18000
+

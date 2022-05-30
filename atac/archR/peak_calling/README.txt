@@ -1,0 +1,3 @@
+
+PijuanSala:
+we called peaks on the pooled sample of high-quality barcodes using macs2 callpeak50 (macs2 2.1.0.20150420) with ‘P = 0.05,–nomodel,–shift 0,–extsize 150’ and discarded peaks falling in blacklisted mm10 genomic regions from the ENCODE Project Consortium51 using bedtools intersect (v2.21.0). The resulting peak summits were extended ±250 bp and subsequently merged with the promoter coordinates of genes from ensembl GRCm38.92 (from TSS to TSS –500 bp) using bedtools merge (v2.21.0).

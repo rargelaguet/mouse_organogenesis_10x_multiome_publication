@@ -1,0 +1,11 @@
+name: velocyto
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - samtools
+  - velocyto.py
+
+
+# add scvelo et al
+# WARNING: Unable to create progress bar. Consider installing `tqdm` as `pip install tqdm` and `ipywidgets` as `pip install ipywidgets`,

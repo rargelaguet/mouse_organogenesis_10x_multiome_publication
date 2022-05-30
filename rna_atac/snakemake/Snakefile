@@ -1,0 +1,853 @@
+import os
+from re import search
+import getpass
+
+
+############
+## Config ##
+############
+
+host = os.uname()[1]
+if search("BI2404M", host) and getpass.getuser()=="argelagr":
+    configfile: "config_ricard_local.yaml"
+elif search("[headstone|pebble]", host) and getpass.getuser()=="argelagr":
+    configfile: "config_ricard_babraham.yaml"
+else:
+    print("Computer not recognised")
+    exit()
+
+#############################################
+## Wildcard constraints to avoid ambiguity ##
+#############################################
+
+# honestly I don't understand why do I have to do this, but otherwise I get ambiguity and strange wildcards
+
+wildcard_constraints:
+    # matrices_metacells = '|'.join([re.escape(x) for x in config["aggregate_atac_metacells"]["matrices"]]),
+    sample_metacell = '|'.join([re.escape(x) for x in config["samples"]]),
+    motif_annotation = '|'.join([re.escape(x) for x in config["create_virtual_chip_pseudobulk"]["motif_annotation"]]),
+    celltypeA = '|'.join([re.escape(x) for x in config["celltypes"]]),
+    celltypeB = '|'.join([re.escape(x) for x in config["celltypes"]])
+
+##################################
+## Filter wildcard combinations ##
+##################################
+
+from itertools import product
+
+def filter_combinator(combinator, blacklist):
+    def filtered_combinator(*args, **kwargs):
+        for wc_comb in combinator(*args, **kwargs):
+            if frozenset(wc_comb) not in blacklist:
+                yield wc_comb
+    return filtered_combinator
+
+forbidden = {
+    frozenset({("motif_annotation",j),("celltypeA",i),("celltypeB",i)}) for j in config["motif_annotations"] for i in config["celltypes"]
+}
+
+filtered_product_celltypes = filter_combinator(product, forbidden)
+
+###########
+## Rules ##
+###########
+
+rule all:
+    input:
+        # Gene expression vs promoter accessibility (pseudobulk)
+        config["directories"]["results"] + "/rna_atac/rna_vs_acc/pseudobulk/gene_expr_vs_promoter_acc/cor_gene_expr_vs_promoter_acc_pseudobulk.txt.gz",
+        config["directories"]["results"] + "/rna_atac/rna_vs_acc/pseudobulk/gene_expr_vs_promoter_acc/volcano_cor_gene_expr_vs_promoter_acc_pseudobulk.pdf",
+
+        # Gene expression vs peak accessibility (pseudobulk)
+        config["directories"]["results"] + "/rna_atac/rna_vs_acc/pseudobulk/gene_expr_vs_peak_acc/cor_gene_expr_vs_peak_acc_pseudobulk.txt.gz",
+
+        # Gene expression vs chromVAR (pseudobulk)
+        expand(config["directories"]["results"] + "/rna_atac/rna_vs_chromvar/pseudobulk/per_gene/{motif_annotation}/cor_rna_vs_chromvar_{motif_annotation}_per_gene_pseudobulk.txt.gz", motif_annotation=config["rna_vs_chromvar_per_gene_pseudobulk"]["motif_annotation"]),
+        expand(config["directories"]["results"] + "/rna_atac/rna_vs_chromvar/pseudobulk/per_gene/{motif_annotation}/completed.txt", motif_annotation=config["rna_vs_chromvar_per_gene_pseudobulk"]["motif_annotation"]),
+        expand(config["directories"]["results"] + "/rna_atac/rna_vs_chromvar/pseudobulk/per_celltype/{motif_annotation}/completed.txt", motif_annotation=config["rna_vs_chromvar_per_celltype_pseudobulk"]["motif_annotation"]),
+
+        # TF expression vs peak accessibility
+        expand(config["directories"]["results"] + "/rna_atac/rna_vs_acc/pseudobulk/TFexpr_vs_peakAcc/{motif_annotation}_cor_TFexpr_vs_peakAcc.rds", motif_annotation=config["tf_expr_vs_peak_accessibility"]["motif_annotation"]),
+        expand(config["directories"]["results"] + "/rna_atac/rna_vs_acc/metacells/TFexpr_vs_peakAcc/{motif_annotation}_cor_TFexpr_vs_peakAcc.rds", motif_annotation=config["tf_expr_vs_peak_accessibility"]["motif_annotation"]),
+        expand(config["directories"]["results"] + "/rna_atac/rna_vs_acc/metacells/trajectories/{trajectory_metacells}/TFexpr_vs_peakAcc/{motif_annotation}_cor_TFexpr_vs_peakAcc.rds", trajectory_metacells=config["trajectories"], motif_annotation=config["tf_expr_vs_peak_accessibility"]["motif_annotation"]),
+
+        # In silico ChIP-seq
+        expand(config["directories"]["results"] + "/rna_atac/virtual_chipseq/pseudobulk/{motif_annotation}/virtual_chip_matrix.rds", motif_annotation=config["create_virtual_chip_pseudobulk"]["motif_annotation"]),
+        expand(config["directories"]["results"] + "/rna_atac/virtual_chipseq/metacells/{motif_annotation}/virtual_chip_matrix.rds", motif_annotation=config["create_virtual_chip_metacells"]["motif_annotation"]),
+        expand(config["directories"]["results"] + "/rna_atac/virtual_chipseq/metacells/trajectories/{trajectory_metacells}/{motif_annotation}/virtual_chip_matrix.rds", trajectory_metacells=config["trajectories"], motif_annotation=config["create_virtual_chip_metacells"]["motif_annotation"]),
+
+        # link TFs to genes using the in silico ChIP-seq
+        expand(config["directories"]["results"] + "/rna_atac/virtual_chipseq/pseudobulk/{motif_annotation}/TF2gene_after_virtual_chip.txt.gz", motif_annotation=config["create_virtual_chip_pseudobulk"]["motif_annotation"]),
+        expand(config["directories"]["results"] + "/rna_atac/virtual_chipseq/metacells/{motif_annotation}/TF2gene_after_virtual_chip.txt.gz", motif_annotation=config["create_virtual_chip_metacells"]["motif_annotation"]),
+        expand(config["directories"]["results"] + "/rna_atac/virtual_chipseq/metacells/trajectories/{trajectory_metacells}/{motif_annotation}/TF2gene_after_virtual_chip.txt.gz", trajectory_metacells=config["trajectories"], motif_annotation=config["create_virtual_chip_pseudobulk"]["motif_annotation"]),
+
+        # chromVAR-ChIP
+        expand(config["directories"]["results"] + "/atac/archR/chromvar_chip/pseudobulk/chromVAR_chip_{motif_annotation}_chromvar.rds", motif_annotation=config["create_virtual_chip_pseudobulk"]["motif_annotation"]),
+        expand(config["directories"]["results"] + "/atac/archR/chromvar_chip/pseudobulk_with_replicates/chromVAR_chip_{motif_annotation}_chromvar.rds", motif_annotation=config["create_virtual_chip_pseudobulk"]["motif_annotation"]),
+        expand(config["directories"]["results"] + "/atac/archR/chromvar_chip/metacells/chromVAR_chip_{motif_annotation}_chromvar.rds", motif_annotation=config["create_virtual_chip_metacells"]["motif_annotation"]),
+        expand(config["directories"]["results"] + "/atac/archR/chromvar_chip/cells/chromVAR_chip_{motif_annotation}_archr.rds", motif_annotation=config["create_virtual_chip_metacells"]["motif_annotation"]),
+
+        # Differential chromVAR-ChIP between cell types
+        expand(config["directories"]["results"]+"/atac/archR/chromvar_chip/pseudobulk_with_replicates/differential/celltypes/{motif_annotation}/{celltypeA}_vs_{celltypeB}.txt.gz", filtered_product_celltypes, 
+            motif_annotation = config["motif_annotations"], 
+            celltypeA=config["celltypes"][:1], celltypeB=config["celltypes"]),
+        # expand(config["directories"]["results"] + "/atac/archR/chromvar_chip/pseudobulk/differential/celltypes/{motif_annotation}/completed.txt", motif_annotation=config["create_virtual_chip_pseudobulk"]["motif_annotation"]),
+        # expand(config["directories"]["results"] + "/atac/archR/chromvar_chip/metacells/differential/celltypes/{motif_annotation}/completed.txt", motif_annotation=config["create_virtual_chip_metacells"]["motif_annotation"]),
+
+        # Parsed differential chromVAR-ChIP results
+        expand(config["directories"]["results"]+"/atac/archR/chromvar_chip/pseudobulk_with_replicates/differential/celltypes/{motif_annotation}/parsed/diff_results.txt.gz", motif_annotation = config["motif_annotations"]),
+
+        # Define markers using chromVARA-ChIP results
+        expand(config["directories"]["results"]+"/atac/archR/chromvar_chip/pseudobulk_with_replicates/differential/celltypes/{motif_annotation}/parsed/markers_all.txt.gz", motif_annotation = config["motif_annotations"]),
+
+        # RNA vs chromVAR-ChIP
+        expand(config["directories"]["results"] + "/rna_atac/rna_vs_chromvar_chip/pseudobulk/per_gene/{motif_annotation}/cor_rna_vs_chromvar_chip_{motif_annotation}_per_gene_pseudobulk.txt.gz", motif_annotation=config["create_virtual_chip_pseudobulk"]["motif_annotation"]),
+        expand(config["directories"]["results"] + "/rna_atac/rna_vs_chromvar_chip/pseudobulk/per_celltype/{motif_annotation}/{motif_annotation}_completed.txt", motif_annotation=config["create_virtual_chip_pseudobulk"]["motif_annotation"]),
+        # expand(config["directories"]["results"] + "/rna_atac/rna_vs_chromvar_chip/metacells/per_gene/{motif_annotation}/cor_rna_vs_chromvar_chip_{motif_annotation}_per_gene_metacells.txt.gz", motif_annotation=config["create_virtual_chip_metacells"]["motif_annotation"]),
+
+        
+        # expand(config["directories"]["results"] + "/rna_atac/rna_vs_chromvar_chip/trajectories/{trajectory_name}/correlation_results.txt.gz", trajectory_name=config["rna_vs_chromvar_chip_trajectory"]["trajectory_name"])
+
+        # MOFA
+        expand(config["directories"]["results"] + "/rna_atac/mofa/remove_ExE_cells_{remove_ExE_cells}/rna.mtx", remove_ExE_cells=config["prepare_mofa"]["remove_ExE_cells"]),
+        expand(config["directories"]["results"] + "/rna_atac/mofa/remove_ExE_cells_{remove_ExE_cells}/atac_tfidf.mtx", remove_ExE_cells=config["prepare_mofa"]["remove_ExE_cells"]),
+        expand(config["directories"]["results"] + "/rna_atac/mofa/remove_ExE_cells_{remove_ExE_cells}/atac_features.txt", remove_ExE_cells=config["prepare_mofa"]["remove_ExE_cells"]),
+        expand(config["directories"]["results"] + "/rna_atac/mofa/remove_ExE_cells_{remove_ExE_cells}/rna_features.txt", remove_ExE_cells=config["prepare_mofa"]["remove_ExE_cells"]),
+        expand(config["directories"]["results"] + "/rna_atac/mofa/remove_ExE_cells_{remove_ExE_cells}/cells.txt", remove_ExE_cells=config["prepare_mofa"]["remove_ExE_cells"]),
+        expand(config["directories"]["results"] + "/rna_atac/mofa/remove_ExE_cells_{remove_ExE_cells}/sample_metadata.txt.gz", remove_ExE_cells=config["prepare_mofa"]["remove_ExE_cells"]),
+        expand(config["directories"]["results"] + "/rna_atac/mofa/remove_ExE_cells_{remove_ExE_cells}/mofa.hdf5", remove_ExE_cells=config["prepare_mofa"]["remove_ExE_cells"]),
+        expand(config["directories"]["results"] + "/rna_atac/mofa/remove_ExE_cells_{remove_ExE_cells}/batch_correction_{mofa_batch_correction}/factors.txt.gz", remove_ExE_cells=config["prepare_mofa"]["remove_ExE_cells"], mofa_batch_correction=config["plot_mofa_results"]["batch_correction"]),
+
+        # fast MOFA
+        config["directories"]["results"] + "/rna_atac/mofa/fast/mofa.rds",
+        expand(config["directories"]["results"] + "/rna_atac/mofa/fast/pdf/batch_correction_{mofa_batch_correction}/factors.txt.gz", mofa_batch_correction=config["plot_mofa_results"]["batch_correction"])
+
+        # expand(config["directories"]["results"] + "/rna_atac/rna_vs_acc/trajectories/{trajectory_name}/TFexpr_vs_peakAcc_{motif_annotation}_{trajectory_name}.rds", 
+        #     motif_annotation=config["tf_expr_vs_peak_accessibility_trajectory"]["motif_annotation"], trajectory_name=config["tf_expr_vs_peak_accessibility_trajectory"]["trajectory_name"] )
+
+###############################
+## RNA vs gene accessibility ##
+###############################
+
+rule run_gene_expr_vs_promoter_acc_pseudobulk:
+    input:
+        script = config["scripts"]["run_gene_expr_vs_promoter_acc_pseudobulk"],
+        sce = config["resources"]["sce_rna_pseudobulk"],
+        atac_gene_score_matrix = config["resources"]["atac_gene_score_matrix_pseudobulk"]
+    output:
+        config["directories"]["results"] + "/rna_atac/rna_vs_acc/pseudobulk/gene_expr_vs_promoter_acc/cor_gene_expr_vs_promoter_acc_pseudobulk.txt.gz"
+    threads: 
+        config["slurm"]["run_gene_expr_vs_promoter_acc_pseudobulk"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["run_gene_expr_vs_promoter_acc_pseudobulk"]["memory"]
+    log: 
+        "logs/cor_gene_expr_vs_promoter_acc_pseudobulk.log"
+    shell:
+        "Rscript {input.script} --sce {input.sce} --gene_score_matrix {input.atac_gene_score_matrix} --outfile {output} > {log}"
+
+rule run_gene_expr_vs_promoter_acc_metacells:
+    input:
+        script = config["scripts"]["run_gene_expr_vs_promoter_acc_metacells"],
+        sce = config["resources"]["sce_rna_metacells"],
+        atac_gene_score_matrix = config["resources"]["atac_gene_score_matrix_metacells"]
+    output:
+        config["directories"]["results"] + "/rna_atac/rna_vs_acc/metacells/gene_expr_vs_promoter_acc/cor_gene_expr_vs_promoter_acc_metacells.txt.gz"
+    threads: 
+        config["slurm"]["run_gene_expr_vs_promoter_acc_metacells"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["run_gene_expr_vs_promoter_acc_metacells"]["memory"]
+    log: 
+        "logs/cor_gene_expr_vs_promoter_acc_metacells.log"
+    shell:
+        "Rscript {input.script} --sce {input.sce} --gene_score_matrix {input.atac_gene_score_matrix} --outfile {output} > {log}"
+
+rule plot_gene_expr_vs_promoter_acc_pseudobulk:
+    input:
+        script = config["scripts"]["plot_gene_expr_vs_promoter_acc_pseudobulk"],
+        sce = config["resources"]["sce_rna_pseudobulk"],
+        atac_gene_score_matrix = config["resources"]["atac_gene_score_matrix_pseudobulk"],
+        cor_results = rules.run_gene_expr_vs_promoter_acc_pseudobulk.output
+    output:
+        config["directories"]["results"] + "/rna_atac/rna_vs_acc/pseudobulk/gene_expr_vs_promoter_acc/volcano_cor_gene_expr_vs_promoter_acc_pseudobulk.pdf"
+    params:
+        outdir = config["directories"]["results"] + "/rna_atac/rna_vs_acc/pseudobulk/gene_expr_vs_promoter_acc"
+    threads: 
+        config["slurm"]["plot_gene_expr_vs_promoter_acc_pseudobulk"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["plot_gene_expr_vs_promoter_acc_pseudobulk"]["memory"]
+    log: 
+        "logs/cor_gene_expr_vs_promoter_acc_pseudobulk.log"
+    shell:
+        "Rscript {input.script} --sce {input.sce} --gene_score_matrix {input.atac_gene_score_matrix} --cor_results {input.cor_results} --outdir {params.outdir} > {log}"
+
+###########################################
+## gene expression vs peak accessibility ##
+###########################################
+
+rule run_gene_expr_vs_peak_acc_pseudobulk:
+    input:
+        script = config["scripts"]["run_gene_expr_vs_peak_acc_pseudobulk"],
+        sce = config["resources"]["sce_rna_pseudobulk"],
+        atac_peak_matrix = config["resources"]["atac_peak_matrix_pseudobulk"],
+        peak2gene = config["resources"]["peak2gene_all"]
+    output:
+        config["directories"]["results"] + "/rna_atac/rna_vs_acc/pseudobulk/gene_expr_vs_peak_acc/cor_gene_expr_vs_peak_acc_pseudobulk.txt.gz"
+    params:
+        distance = config["run_gene_expr_vs_peak_acc_pseudobulk"]["distance"]
+    threads: 
+        config["slurm"]["run_gene_expr_vs_peak_acc_pseudobulk"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["run_gene_expr_vs_peak_acc_pseudobulk"]["memory"]
+    log: 
+        "logs/run_gene_expr_vs_peak_acc_pseudobulk.log"
+    shell:
+        "Rscript {input.script} --sce {input.sce} --atac_peak_matrix {input.atac_peak_matrix} --peak2gene {input.peak2gene} \
+        --outfile {output} --distance {params.distance} > {log}"
+
+# TO-DO
+# rule plot_gene_expr_vs_peak_acc_pseudobulk:
+#     input:
+#         script = config["scripts"]["plot_gene_expr_vs_peak_acc_pseudobulk"],
+#         sce = config["resources"]["sce_rna_pseudobulk"],
+#         atac_peak_matrix = config["resources"]["atac_peak_matrix_pseudobulk"]
+#     output:
+#         config["directories"]["results"] + "/rna_atac/gene_expr_vs_peak_acc/pseudobulk/foo.pdf",    # NEEDS TO BE FIXED
+#     params:
+#         outdir = config["directories"]["results"] + "/rna_atac/gene_expr_vs_peak_acc/pseudobulk"
+#     threads: 
+#         config["slurm"]["plot_gene_expr_vs_peak_acc_pseudobulk"]["threads"]
+#     resources:
+#         mem_mb = config["slurm"]["plot_gene_expr_vs_peak_acc_pseudobulk"]["memory"]
+#     log: 
+#         "logs/plot_gene_expr_vs_peak_acc_pseudobulk"
+#     shell:
+#         "Rscript {input.script} --sce {input.sce} --atac_peak_matrix {input.atac_peak_matrix} \
+#         --outdir {params.outdir} > {log}"
+
+##################################
+## RNA vs chromVAR (pseudobulk) ##
+##################################
+
+rule cor_rna_vs_chromvar_per_gene_pseudobulk:
+    input:
+        sce = config["resources"]["sce_rna_pseudobulk"],
+        atac_chromvar_matrix = config["directories"]["results"] + "/atac/archR/chromvar/pseudobulk/celltype/chromVAR_deviations_{motif_annotation}_pseudobulk_archr.rds",
+        motif2gene = config["directories"]["processed_data"] + "/Annotations/{motif_annotation}_motif2gene.txt.gz",
+        script = config["scripts"]["cor_rna_vs_chromvar_per_gene_pseudobulk"]
+    output:
+        config["directories"]["results"] + "/rna_atac/rna_vs_chromvar/pseudobulk/per_gene/{motif_annotation}/cor_rna_vs_chromvar_{motif_annotation}_per_gene_pseudobulk.txt.gz"
+    threads: 
+        config["slurm"]["rna_vs_chromvar_per_gene_pseudobulk"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["rna_vs_chromvar_per_gene_pseudobulk"]["memory"]
+    log: 
+        "logs/cor_rna_vs_chromvar_per_gene_pseudobulk_{motif_annotation}.log"
+    shell:
+        "Rscript {input.script} --sce {input.sce} --atac_chromvar_matrix {input.atac_chromvar_matrix} --motif_annotation {wildcards.motif_annotation} --motif2gene {input.motif2gene} --outfile {output} > {log}"
+
+rule plot_rna_vs_chromvar_per_gene_pseudobulk:
+    input:
+        sce = config["resources"]["sce_rna_pseudobulk"],
+        atac_chromvar_matrix = config["directories"]["results"] + "/atac/archR/chromvar/pseudobulk/celltype/chromVAR_deviations_{motif_annotation}_pseudobulk_archr.rds",
+        motif2gene = config["directories"]["processed_data"] + "/Annotations/{motif_annotation}_motif2gene.txt.gz",
+        script = config["scripts"]["plot_rna_vs_chromvar_per_gene_pseudobulk"],
+        cor = rules.cor_rna_vs_chromvar_per_gene_pseudobulk.output
+    output:
+        config["directories"]["results"] + "/rna_atac/rna_vs_chromvar/pseudobulk/per_gene/{motif_annotation}/completed.txt"
+    params:
+        outdir = config["directories"]["results"] + "/rna_atac/rna_vs_chromvar/pseudobulk/per_gene/{motif_annotation}"
+    threads: 
+        config["slurm"]["rna_vs_chromvar_per_gene_pseudobulk"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["rna_vs_chromvar_per_gene_pseudobulk"]["memory"]
+    log: 
+        "logs/plot_rna_vs_chromvar_per_gene_pseudobulk_{motif_annotation}.log"
+    shell:
+        "Rscript {input.script} --sce {input.sce} --atac_chromvar_matrix {input.atac_chromvar_matrix} --cor_results {input.cor} --motif_annotation {wildcards.motif_annotation} \
+        --motif2gene {input.motif2gene} --outdir {params.outdir} > {log}"
+
+rule rna_vs_chromvar_per_celltype_pseudobulk:
+    input:
+        script = config["scripts"]["rna_vs_chromvar_per_celltype_pseudobulk"],
+        sce = config["resources"]["sce_rna_pseudobulk"],
+        atac_chromvar_matrix = config["directories"]["results"] + "/atac/archR/chromvar/pseudobulk/celltype/chromVAR_deviations_{motif_annotation}_pseudobulk_archr.rds",
+        motif2gene = config["directories"]["processed_data"] + "/Annotations/{motif_annotation}_motif2gene.txt.gz",
+        cor = rules.cor_rna_vs_chromvar_per_gene_pseudobulk.output
+    output:
+        config["directories"]["results"] + "/rna_atac/rna_vs_chromvar/pseudobulk/per_celltype/{motif_annotation}/completed.txt"
+    params:
+        outdir = config["directories"]["results"] + "/rna_atac/rna_vs_chromvar/pseudobulk/per_celltype/{motif_annotation}"
+    threads: 
+        config["slurm"]["rna_vs_chromvar_per_celltype_pseudobulk"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["rna_vs_chromvar_per_celltype_pseudobulk"]["memory"]
+    log: 
+        "logs/rna_vs_chromvar_per_celltype_pseudobulk_{motif_annotation}.log"
+    shell:
+        "Rscript {input.script} --sce {input.sce} --atac_chromvar_matrix {input.atac_chromvar_matrix} --cor_rna_vs_chromvar_per_gene {input.cor} \
+        --motif_annotation {wildcards.motif_annotation} --motif2gene {input.motif2gene} --outdir {params.outdir} > {log}"
+
+#########################################
+## TF expression vs peak accessibility ##
+#########################################
+
+rule run_tf_expr_vs_peak_accessibility_pseudobulk:
+    input:
+        script = config["scripts"]["run_tf_expr_vs_peak_accessibility_pseudobulk"],
+        sce = config["resources"]["sce_rna_pseudobulk"],
+        atac_peak_matrix = config["resources"]["atac_peak_matrix_pseudobulk"],
+        motifmatcher = config["directories"]["processed_data"]+"/Annotations/{motif_annotation}-Scores.rds",
+        # motifmatcher = expand(config["directories"]["processed_data"]+"/Annotations/{motif_annotation}-Scores.rds", motif_annotation=config["tf_expr_vs_peak_accessibility"]["motif_annotation"])
+        motif2gene = config["directories"]["processed_data"]+"/Annotations/{motif_annotation}_motif2gene.txt.gz"
+    output:
+        config["directories"]["results"] + "/rna_atac/rna_vs_acc/pseudobulk/TFexpr_vs_peakAcc/{motif_annotation}_cor_TFexpr_vs_peakAcc.rds"
+    params:
+        outdir = config["directories"]["results"] + "/rna_atac/rna_vs_acc/pseudobulk/TFexpr_vs_peakAcc"
+    threads: 
+        config["slurm"]["tf_expr_vs_peak_accessibility"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["tf_expr_vs_peak_accessibility"]["memory"]
+    log: 
+        "logs/{motif_annotation}_tf_expr_vs_peak_accessibility_pseudobulk.log"
+    shell:
+        "Rscript {input.script} --sce {input.sce} --atac_peak_matrix {input.atac_peak_matrix} --motif_annotation {wildcards.motif_annotation} \
+        --motifmatcher {input.motifmatcher} --motif2gene {input.motif2gene} --outdir {params.outdir} > {log}"
+         # --motif2gene {input.motif2gene}
+
+# rule run_tf_expr_vs_peak_accessibility_trajectory:
+#     input:
+#         script = config["scripts"]["tf_expr_vs_peak_accessibility_trajectory"],
+#         sce = config["directories"]["results"]+"/rna/trajectories/{trajectory_name}/{trajectory_name}_SingleCellExperiment.rds",
+#         metadata = config["directories"]["results"]+"/rna/trajectories/{trajectory_name}/{trajectory_name}_sample_metadata.txt.gz",
+#         trajectory = config["directories"]["results"]+"/rna/trajectories/{trajectory_name}/{trajectory_name}_trajectory.txt.gz",
+#         motifmatcher = config["directories"]["processed_data"]+"/Annotations/{motif_annotation}-Scores.rds"
+#         # motifmatcher = expand(config["directories"]["processed_data"]+"/Annotations/{motif_annotation}-Scores.rds", motif_annotation=config["tf_expr_vs_peak_accessibility_trajectory"]["motif_annotation"])
+#         # motif2gene = expand(config["directories"]["processed_data"]+"/Annotations/{motif_annotation}_motif2gene.txt.gz", motif_annotation=config["tf_expr_vs_peak_accessibility_trajectory"]["motif_annotation"])
+#     output:
+#         config["directories"]["results"] + "/rna_atac/rna_vs_acc/trajectories/{trajectory_name}/TFexpr_vs_peakAcc_{motif_annotation}_{trajectory_name}.rds"
+#     params:
+#         outdir = config["directories"]["results"] + "/rna_atac/rna_vs_acc/trajectories/{trajectory_name}"
+#     threads: 
+#         config["slurm"]["tf_expr_vs_peak_accessibility_trajectory"]["threads"]
+#     resources:
+#         mem_mb = config["slurm"]["tf_expr_vs_peak_accessibility_trajectory"]["memory"]
+#     log: 
+#         "logs/{motif_annotation}_tf_expr_vs_peak_accessibility_{trajectory_name}_trajectory.log"
+#     shell:
+#         "Rscript {input.script} --sce {input.sce} --trajectory_name {wildcards.trajectory_name} --trajectory {input.trajectory} --metadata {input.metadata} --motif_annotation {wildcards.motif_annotation} \
+#         --outdir {params.outdir} --motifmatcher {input.motifmatcher} --test_mode > {log}"  # --denoise --knn {params.knn} --pca_rna {input.pca_rna} --pca_atac {input.pca_atac}
+
+rule run_tf_expr_vs_peak_accessibility_metacells:
+    input:
+        script = config["scripts"]["tf_expr_vs_peak_accessibility_metacells"],
+        sce = config["resources"]["sce_rna_metacells"],
+        atac_peak_matrix = config["resources"]["atac_peak_matrix_metacells"],
+        # atac_peak_matrix = expand(rules.aggregate_atac_metacells.output, matrices_metacells="PeakMatrix"),
+        motifmatcher = config["directories"]["processed_data"]+"/Annotations/{motif_annotation}-Scores.rds",
+        motif2gene = config["directories"]["processed_data"]+"/Annotations/{motif_annotation}_motif2gene.txt.gz"
+    output:
+        config["directories"]["results"] + "/rna_atac/rna_vs_acc/metacells/TFexpr_vs_peakAcc/{motif_annotation}_cor_TFexpr_vs_peakAcc.rds"
+    params:
+        outdir = config["directories"]["results"] + "/rna_atac/rna_vs_acc/metacells/TFexpr_vs_peakAcc"
+    threads: 
+        config["slurm"]["tf_expr_vs_peak_accessibility_metacells"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["tf_expr_vs_peak_accessibility_metacells"]["memory"]
+    log: 
+        "logs/{motif_annotation}_tf_expr_vs_peak_accessibility_metacells.log"
+    shell:
+        "Rscript {input.script} --sce {input.sce} --atac_peak_matrix {input.atac_peak_matrix} --motif_annotation {wildcards.motif_annotation} \
+        --outdir {params.outdir} --motifmatcher {input.motifmatcher} --motif2gene {input.motif2gene} > {log}"
+
+# FIX NMP
+rule run_tf_expr_vs_peak_accessibility_metacells_trajectories:
+    input:
+        script = config["scripts"]["tf_expr_vs_peak_accessibility_metacells"],
+        # sce = config["resources"]["sce_rna_metacells_trajectory"]["{trajectory_metacells}"],
+        sce = config["resources"]["sce_rna_metacells_trajectory"]["nmp"],
+        # atac_peak_matrix = config["resources"]["atac_peak_matrix_metacells_trajectory"]["{trajectory_metacells}"],
+        atac_peak_matrix = config["resources"]["atac_peak_matrix_metacells_trajectory"]["nmp"],
+        motifmatcher = config["directories"]["processed_data"]+"/Annotations/{motif_annotation}-Scores.rds",
+        motif2gene = config["directories"]["processed_data"]+"/Annotations/{motif_annotation}_motif2gene.txt.gz"
+    output:
+        config["directories"]["results"] + "/rna_atac/rna_vs_acc/metacells/trajectories/{trajectory_metacells}/TFexpr_vs_peakAcc/{motif_annotation}_cor_TFexpr_vs_peakAcc.rds"
+    params:
+        outdir = config["directories"]["results"] + "/rna_atac/rna_vs_acc/metacells/trajectories/{trajectory_metacells}/TFexpr_vs_peakAcc"
+    threads: 
+        config["slurm"]["tf_expr_vs_peak_accessibility_metacells"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["tf_expr_vs_peak_accessibility_metacells"]["memory"]
+    log: 
+        "logs/{motif_annotation}_{trajectory_metacells}_tf_expr_vs_peak_accessibility_metacells.log"
+    shell:
+        "Rscript {input.script} --sce {input.sce} --atac_peak_matrix {input.atac_peak_matrix} --motif_annotation {wildcards.motif_annotation} \
+        --outdir {params.outdir} --motifmatcher {input.motifmatcher} --motif2gene {input.motif2gene} > {log}"
+
+##############################
+## Virtual ChIP-seq library ##
+##############################
+
+rule create_virtual_chip_pseudobulk:
+    input:
+        script = config["scripts"]["create_virtual_chip_pseudobulk"],
+        atac_peak_matrix = config["resources"]["atac_peak_matrix_pseudobulk"],
+        peak_metadata = config["directories"]["processed_data"]+"/PeakCalls/peak_metadata.tsv.gz",
+        motifmatcher = config["directories"]["processed_data"]+"/Annotations/{motif_annotation}-Scores.rds",
+        motif2gene = config["directories"]["processed_data"]+"/Annotations/{motif_annotation}_motif2gene.txt.gz",
+        tf2peak_cor = rules.run_tf_expr_vs_peak_accessibility_pseudobulk.output
+    output:
+        mtx = config["directories"]["results"] + "/rna_atac/virtual_chipseq/pseudobulk/{motif_annotation}/virtual_chip_matrix.rds",
+        motifmatchr = config["directories"]["results"] + "/rna_atac/virtual_chipseq/pseudobulk/{motif_annotation}/motifmatchr_virtual_chip.rds"
+    params:
+        # max_acc_score = config["create_virtual_chip_pseudobulk"]["max_acc_score"],
+        # min_peak_score = config["create_virtual_chip_pseudobulk"]["min_peak_score"],
+        min_number_peaks = config["create_virtual_chip_pseudobulk"]["min_number_peaks"],
+        outdir = config["directories"]["results"] + "/rna_atac/virtual_chipseq/pseudobulk/{motif_annotation}"
+    threads: 
+        config["slurm"]["create_virtual_chip_pseudobulk"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["create_virtual_chip_pseudobulk"]["memory"]
+    log: 
+        "logs/create_virtual_chip_pseudobulk_{motif_annotation}.log"
+    shell:
+        "Rscript {input.script} --motif2gene {input.motif2gene} --tf2peak_cor {input.tf2peak_cor} --atac_peak_matrix {input.atac_peak_matrix} \
+        --motif_annotation {wildcards.motif_annotation} --peak_metadata {input.peak_metadata} --motifmatcher {input.motifmatcher} \
+        --min_number_peaks {params.min_number_peaks} --outdir {params.outdir} > {log}" # --min_peak_score {params.min_peak_score} 
+
+rule create_virtual_chip_metacells:
+    input:
+        script = config["scripts"]["create_virtual_chip_metacells"],
+        atac_peak_matrix = config["resources"]["atac_peak_matrix_metacells"],
+        peak_metadata = config["directories"]["processed_data"]+"/PeakCalls/peak_metadata.tsv.gz",
+        motifmatcher = config["directories"]["processed_data"]+"/Annotations/{motif_annotation}-Scores.rds",
+        motif2gene = config["directories"]["processed_data"]+"/Annotations/{motif_annotation}_motif2gene.txt.gz",
+        tf2peak_cor = rules.run_tf_expr_vs_peak_accessibility_metacells.output
+    output:
+        mtx = config["directories"]["results"] + "/rna_atac/virtual_chipseq/metacells/{motif_annotation}/virtual_chip_matrix.rds",
+        motifmatchr = config["directories"]["results"] + "/rna_atac/virtual_chipseq/metacells/{motif_annotation}/motifmatchr_virtual_chip.rds"
+    params:
+        # max_acc_score = config["create_virtual_chip_metacells"]["max_acc_score"],
+        # min_peak_score = config["create_virtual_chip_metacells"]["min_peak_score"],
+        min_number_peaks = config["create_virtual_chip_metacells"]["min_number_peaks"],
+        outdir = config["directories"]["results"] + "/rna_atac/virtual_chipseq/metacells/{motif_annotation}"
+    threads: 
+        config["slurm"]["create_virtual_chip_metacells"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["create_virtual_chip_metacells"]["memory"]
+    log: 
+        "logs/create_virtual_chip_metacells_{motif_annotation}.log"
+    shell:
+        "Rscript {input.script} --tf2peak_cor {input.tf2peak_cor} --atac_peak_matrix {input.atac_peak_matrix} --motif_annotation {wildcards.motif_annotation} --peak_metadata {input.peak_metadata} \
+        --motifmatcher {input.motifmatcher} --min_number_peaks {params.min_number_peaks} --motif2gene {input.motif2gene} --outdir {params.outdir} > {log}" # --min_peak_score {params.min_peak_score}
+
+# FIX NMP
+rule create_virtual_chip_metacells_trajectories:
+    input:
+        script = config["scripts"]["create_virtual_chip_metacells"],
+        atac_peak_matrix = config["resources"]["atac_peak_matrix_metacells_trajectory"]["nmp"],
+        peak_metadata = config["directories"]["processed_data"]+"/PeakCalls/peak_metadata.tsv.gz",
+        motifmatcher = config["directories"]["processed_data"]+"/Annotations/{motif_annotation}-Scores.rds",
+        motif2gene = config["directories"]["processed_data"]+"/Annotations/{motif_annotation}_motif2gene.txt.gz",
+        tf2peak_cor = rules.run_tf_expr_vs_peak_accessibility_metacells_trajectories.output
+    output:
+        mtx = config["directories"]["results"] + "/rna_atac/virtual_chipseq/metacells/trajectories/{trajectory_metacells}/{motif_annotation}/virtual_chip_matrix.rds",
+        motifmatchr = config["directories"]["results"] + "/rna_atac/virtual_chipseq/metacells/trajectories/{trajectory_metacells}/{motif_annotation}/motifmatchr_virtual_chip.rds"
+    params:
+        # max_acc_score = config["create_virtual_chip_metacells"]["max_acc_score"],
+        # min_peak_score = config["create_virtual_chip_metacells"]["min_peak_score"],
+        min_number_peaks = config["create_virtual_chip_metacells"]["min_number_peaks"],
+        outdir = config["directories"]["results"] + "/rna_atac/virtual_chipseq/metacells/trajectories/{trajectory_metacells}/{motif_annotation}"
+    threads: 
+        config["slurm"]["create_virtual_chip_metacells"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["create_virtual_chip_metacells"]["memory"]
+    log: 
+        "logs/create_virtual_chip_metacells_{trajectory_metacells}_{motif_annotation}.log"
+    shell:
+        "Rscript {input.script} --tf2peak_cor {input.tf2peak_cor} --atac_peak_matrix {input.atac_peak_matrix} --motif_annotation {wildcards.motif_annotation} --peak_metadata {input.peak_metadata} \
+        --motifmatcher {input.motifmatcher} --min_number_peaks {params.min_number_peaks} --motif2gene {input.motif2gene} --outdir {params.outdir} > {log}" # --min_peak_score {params.min_peak_score}
+
+#############################################
+## Link TF to genes after virtual ChIP-seq ##
+#############################################
+
+rule tf2gene_after_virtual_chip_pseudobulk:
+    input:
+        script = config["scripts"]["tf2gene_after_virtual_chip"],
+        virtual_chip_matrix = rules.create_virtual_chip_pseudobulk.output.mtx,
+        peak2gene = config["resources"]["peak2gene_all"]
+    output:
+        config["directories"]["results"] + "/rna_atac/virtual_chipseq/pseudobulk/{motif_annotation}/TF2gene_after_virtual_chip.txt.gz"
+    params:
+        min_chip_score = config["tf2gene_after_virtual_chip"]["min_chip_score"],
+        distance = config["tf2gene_after_virtual_chip"]["distance"]
+    threads: 
+        config["slurm"]["tf2gene_after_virtual_chip"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["tf2gene_after_virtual_chip"]["memory"]
+    log: 
+        "logs/tf2gene_after_virtual_chip_pseudobulk_{motif_annotation}.log"
+    shell:
+        "Rscript {input.script} --motif_annotation {wildcards.motif_annotation} --virtual_chip_matrix {input.virtual_chip_matrix} \
+        --peak2gene {input.peak2gene} --distance {params.distance} --min_chip_score {params.min_chip_score} --outfile {output} > {log}"
+
+rule tf2gene_after_virtual_chip_metacells:
+    input:
+        script = config["scripts"]["tf2gene_after_virtual_chip"],
+        virtual_chip_matrix = rules.create_virtual_chip_metacells.output.mtx,
+        peak2gene = config["resources"]["peak2gene_all"]
+    output:
+        config["directories"]["results"] + "/rna_atac/virtual_chipseq/metacells/{motif_annotation}/TF2gene_after_virtual_chip.txt.gz"
+    params:
+        min_chip_score = config["tf2gene_after_virtual_chip"]["min_chip_score"],
+        distance = config["tf2gene_after_virtual_chip"]["distance"]
+    threads: 
+        config["slurm"]["tf2gene_after_virtual_chip"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["tf2gene_after_virtual_chip"]["memory"]
+    log: 
+        "logs/tf2gene_after_virtual_chip_pseudobulk_{motif_annotation}.log"
+    shell:
+        "Rscript {input.script} --motif_annotation {wildcards.motif_annotation} --virtual_chip_matrix {input.virtual_chip_matrix} \
+        --peak2gene {input.peak2gene} --distance {params.distance} --min_chip_score {params.min_chip_score} --outfile {output} > {log}"
+
+rule tf2gene_after_virtual_chip_metacells_trajectory:
+    input:
+        script = config["scripts"]["tf2gene_after_virtual_chip"],
+        virtual_chip_matrix = rules.create_virtual_chip_metacells_trajectories.output.mtx,
+        peak2gene = config["resources"]["peak2gene_all"]
+    output:
+        config["directories"]["results"] + "/rna_atac/virtual_chipseq/metacells/trajectories/{trajectory_metacells}/{motif_annotation}/TF2gene_after_virtual_chip.txt.gz"
+    params:
+        min_chip_score = config["tf2gene_after_virtual_chip"]["min_chip_score"],
+        distance = config["tf2gene_after_virtual_chip"]["distance"]
+    threads: 
+        config["slurm"]["tf2gene_after_virtual_chip"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["tf2gene_after_virtual_chip"]["memory"]
+    log: 
+        "logs/tf2gene_after_virtual_chip_pseudobulk_trajectory_{trajectory_metacells}_{motif_annotation}.log"
+    shell:
+        "Rscript {input.script} --motif_annotation {wildcards.motif_annotation} --virtual_chip_matrix {input.virtual_chip_matrix} \
+        --peak2gene {input.peak2gene} --distance {params.distance} --min_chip_score {params.min_chip_score} --outfile {output} > {log}"
+
+#######################
+## Run chromVAR-ChIP ##
+#######################
+
+rule run_chromvar_chip_cells:
+    input:
+        script = config["scripts"]["run_chromvar_chip_cells"],
+        atac_peak_matrix = config["resources"]["atac_peak_matrix_cells"],
+        cell_metadata = config["resources"]["cell_metadata"],
+        peak_metadata = config["resources"]["atac_peak_metadata"],
+        background_peaks = config["resources"]["atac_background_peaks"],
+        motifmatcher_chip = rules.create_virtual_chip_pseudobulk.output.motifmatchr
+    output:
+        config["directories"]["results"] + "/atac/archR/chromvar_chip/cells/chromVAR_chip_{motif_annotation}_archr.rds"
+    params:
+        min_number_peaks = config["run_chromvar_chip"]["min_number_peaks"],
+        min_chip_score = config["run_chromvar_chip"]["min_chip_score"],
+        outdir = config["directories"]["results"] + "/atac/archR/chromvar_chip/cells"
+    threads: 
+        config["slurm"]["run_chromvar_chip_cells"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["run_chromvar_chip_cells"]["memory"]
+    log: 
+        "logs/run_chromvar_chip_cells_{motif_annotation}.log"
+    shell:
+        "Rscript {input.script} --metadata {input.cell_metadata} --motif_annotation {wildcards.motif_annotation} --peak_metadata {input.peak_metadata} --atac_peak_matrix {input.atac_peak_matrix} --motifmatcher {input.motifmatcher_chip} \
+        --background_peaks {input.background_peaks} --min_chip_score {params.min_chip_score} --min_number_peaks {params.min_number_peaks} --ignore_negative_values --outdir {params.outdir} > {log}"
+
+rule run_chromvar_chip_pseudobulk:
+    input:
+        script = config["scripts"]["run_chromvar_chip"],
+        atac_peak_matrix = config["resources"]["atac_peak_matrix_pseudobulk"],
+        peak_metadata = config["directories"]["processed_data"] + "/PeakCalls/peak_metadata.tsv.gz",
+        background_peaks = config["directories"]["processed_data"] + "/Background-Peaks.rds",
+        motifmatcher_chip = rules.create_virtual_chip_pseudobulk.output.motifmatchr
+    output:
+        chromvar = config["directories"]["results"] + "/atac/archR/chromvar_chip/pseudobulk/chromVAR_chip_{motif_annotation}_chromvar.rds",
+        archr = config["directories"]["results"] + "/atac/archR/chromvar_chip/pseudobulk/chromVAR_chip_{motif_annotation}_archr.rds"
+    params:
+        outdir = config["directories"]["results"] + "/atac/archR/chromvar_chip/pseudobulk",
+        min_number_peaks = config["run_chromvar_chip"]["min_number_peaks"],
+        min_chip_score = config["run_chromvar_chip"]["min_chip_score"]
+    threads: 
+        config["slurm"]["run_chromvar_chip_pseudobulk"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["run_chromvar_chip_pseudobulk"]["memory"]
+    log: 
+        "logs/run_chromvar_chip_pseudobulk_{motif_annotation}.log"
+    shell:
+        "Rscript {input.script} --motif_annotation {wildcards.motif_annotation} --atac_peak_matrix {input.atac_peak_matrix} --motifmatcher {input.motifmatcher_chip} \
+        --peak_metadata {input.peak_metadata} --background_peaks {input.background_peaks} --min_chip_score {params.min_chip_score} --min_number_peaks {params.min_number_peaks} --ignore_negative_values --outdir {params.outdir} > {log}"
+
+rule run_chromvar_chip_metacells:
+    input:
+        script = config["scripts"]["run_chromvar_chip"],
+        atac_peak_matrix = config["resources"]["atac_peak_matrix_metacells"],
+        peak_metadata = config["directories"]["processed_data"] + "/PeakCalls/peak_metadata.tsv.gz",
+        background_peaks = config["directories"]["processed_data"] + "/Background-Peaks.rds",
+        motifmatcher_chip = rules.create_virtual_chip_metacells.output.motifmatchr
+    output:
+        chromvar = config["directories"]["results"] + "/atac/archR/chromvar_chip/metacells/chromVAR_chip_{motif_annotation}_chromvar.rds",
+        archr = config["directories"]["results"] + "/atac/archR/chromvar_chip/metacells/chromVAR_chip_{motif_annotation}_archr.rds"
+    params:
+        outdir = config["directories"]["results"] + "/atac/archR/chromvar_chip/metacells",
+        min_number_peaks = config["run_chromvar_chip"]["min_number_peaks"],
+        min_chip_score = config["run_chromvar_chip"]["min_chip_score"]
+    threads: 
+        config["slurm"]["run_chromvar_chip_metacells"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["run_chromvar_chip_metacells"]["memory"]
+    log: 
+        "logs/run_chromvar_chip_metacells_{motif_annotation}.log"
+    shell:
+        "Rscript {input.script} --motif_annotation {wildcards.motif_annotation} --atac_peak_matrix {input.atac_peak_matrix} --motifmatcher {input.motifmatcher_chip} \
+        --peak_metadata {input.peak_metadata} --background_peaks {input.background_peaks} --min_chip_score {params.min_chip_score} --min_number_peaks {params.min_number_peaks} --ignore_negative_values --outdir {params.outdir} > {log}"
+
+rule run_chromvar_chip_pseudobulk_with_replicates:
+    input:
+        script = config["scripts"]["run_chromvar_chip"],
+        atac_peak_matrix = config["resources"]["atac_peak_matrix_pseudobulk_with_replicates"],
+        peak_metadata = config["directories"]["processed_data"] + "/PeakCalls/peak_metadata.tsv.gz",
+        background_peaks = config["directories"]["processed_data"] + "/Background-Peaks.rds",
+        motifmatcher_chip = rules.create_virtual_chip_pseudobulk.output.motifmatchr
+    output:
+        chromvar = config["directories"]["results"] + "/atac/archR/chromvar_chip/pseudobulk_with_replicates/chromVAR_chip_{motif_annotation}_chromvar.rds",
+        archr = config["directories"]["results"] + "/atac/archR/chromvar_chip/pseudobulk_with_replicates/chromVAR_chip_{motif_annotation}_archr.rds"
+    params:
+        outdir = config["directories"]["results"] + "/atac/archR/chromvar_chip/pseudobulk_with_replicates",
+        min_number_peaks = config["run_chromvar_chip"]["min_number_peaks"],
+        min_chip_score = config["run_chromvar_chip"]["min_chip_score"]
+    threads: 
+        config["slurm"]["run_chromvar_chip_pseudobulk"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["run_chromvar_chip_pseudobulk"]["memory"]
+    log: 
+        "logs/run_chromvar_chip_pseudobulk_{motif_annotation}.log"
+    shell:
+        "Rscript {input.script} --motif_annotation {wildcards.motif_annotation} --atac_peak_matrix {input.atac_peak_matrix} --motifmatcher {input.motifmatcher_chip} \
+        --peak_metadata {input.peak_metadata} --background_peaks {input.background_peaks} --min_chip_score {params.min_chip_score} --min_number_peaks {params.min_number_peaks} --ignore_negative_values --outdir {params.outdir} > {log}"
+
+
+##########################################
+## Plot RNA expression vs chromVAR-ChIP ##
+##########################################
+
+rule rna_vs_chromvar_chip_per_gene_pseudobulk:
+    input:
+        script = config["scripts"]["rna_vs_chromvar_chip_per_gene_pseudobulk"],
+        atac_chromvar_chip_pseudobulk = rules.run_chromvar_chip_pseudobulk.output.chromvar,
+        rna_sce_pseudobulk = config["resources"]["sce_rna_tfs_pseudobulk"]
+    output:
+        config["directories"]["results"] + "/rna_atac/rna_vs_chromvar_chip/pseudobulk/per_gene/{motif_annotation}/cor_rna_vs_chromvar_chip_{motif_annotation}_per_gene_pseudobulk.txt.gz"
+    params:
+        outdir = config["directories"]["results"] + "/rna_atac/rna_vs_chromvar_chip/pseudobulk/per_gene/{motif_annotation}"
+    threads: 
+        config["slurm"]["rna_vs_chromvar_chip_per_gene_pseudobulk"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["rna_vs_chromvar_chip_per_gene_pseudobulk"]["memory"]
+    log: 
+        "logs/rna_vs_chromvar_chip_per_gene_pseudobulk_{motif_annotation}.log"
+    shell:
+        "Rscript {input.script} --atac_chromvar_chip_pseudobulk {input.atac_chromvar_chip_pseudobulk} --rna_sce_pseudobulk {input.rna_sce_pseudobulk} \
+         --motif_annotation {wildcards.motif_annotation} --outdir {params.outdir} > {log}"
+
+rule rna_vs_chromvar_chip_per_celltype_pseudobulk:
+    input:
+        script = config["scripts"]["rna_vs_chromvar_chip_per_celltype_pseudobulk"],
+        atac_chromvar_chip_pseudobulk = rules.run_chromvar_chip_pseudobulk.output.chromvar,
+        rna_sce_pseudobulk = config["resources"]["sce_rna_tfs_pseudobulk"],
+        tf_markers = config["resources"]["tf_markers"]
+    output:
+        config["directories"]["results"] + "/rna_atac/rna_vs_chromvar_chip/pseudobulk/per_celltype/{motif_annotation}/{motif_annotation}_completed.txt"
+    params:
+        outdir = config["directories"]["results"] + "/rna_atac/rna_vs_chromvar_chip/pseudobulk/per_celltype/{motif_annotation}"
+    threads: 
+        config["slurm"]["rna_vs_chromvar_chip_per_celltype_pseudobulk"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["rna_vs_chromvar_chip_per_celltype_pseudobulk"]["memory"]
+    log: 
+        "logs/rna_vs_chromvar_chip_per_celltype_pseudobulk_{motif_annotation}.log"
+    shell:
+        "Rscript {input.script} --atac_chromvar_chip_pseudobulk {input.atac_chromvar_chip_pseudobulk} --rna_sce_pseudobulk {input.rna_sce_pseudobulk} \
+        --motif_annotation {wildcards.motif_annotation} --tf_markers {input.tf_markers} --outdir {params.outdir} > {log}"
+
+################################
+## Differential chromVAR-ChIP ##
+################################
+
+rule run_differential_chromvar_chip_celltypes_pseudobulk: 
+    input:
+        script = config["scripts"]["differential_chromvar_chip_celltypes_pseudobulk"],
+        chromvar_chip = rules.run_chromvar_chip_pseudobulk_with_replicates.output.chromvar
+    output:
+        config["directories"]["results"]+"/atac/archR/chromvar_chip/pseudobulk_with_replicates/differential/celltypes/{motif_annotation}/{celltypeA}_vs_{celltypeB}.txt.gz"
+    log: 
+        "logs/differential_chromvar_chip_pseudobulk_celltypes_{motif_annotation}_{celltypeA}_vs_{celltypeB}.log"
+    threads: 
+        config["slurm"]["differential_chromvar"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["differential_chromvar"]["memory"]
+    shell:
+        "Rscript {input.script} --motif_annotation {wildcards.motif_annotation} --chromvar_chip {input.chromvar_chip} --groupA {wildcards.celltypeA} --groupB {wildcards.celltypeB} --outfile {output} > {log}"
+
+rule parse_differential_chromvar_chip_celltypes_pseudobulk: 
+    input:
+        expand(rules.run_differential_chromvar_chip_celltypes_pseudobulk.output, filtered_product_celltypes, motif_annotation="{motif_annotation}", celltypeA=config["celltypes"][:1], celltypeB=config["celltypes"]),
+        script = config["scripts"]["parse_differential_celltype_pseudobulk"],
+    output:
+        config["directories"]["results"]+"/atac/archR/chromvar_chip/pseudobulk_with_replicates/differential/celltypes/{motif_annotation}/parsed/diff_results.txt.gz",
+    params:
+        diff_results_dir = config["directories"]["results"] + "/atac/archR/chromvar_chip/pseudobulk_with_replicates/differential/celltypes/{motif_annotation}"
+    log: 
+        "logs/parse_differential_chromvar_chip_celltype_{motif_annotation}_pseudobulk.log"
+    threads: 
+        config["slurm"]["parse_differential_chromvar"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["parse_differential_chromvar"]["memory"]
+    shell:
+        "Rscript {input.script} --diff_results_dir {params.diff_results_dir} --outfile {output} > {log}"
+
+
+##############################################
+## Define marker TFs based on chromVAR-ChIP ##
+##############################################
+
+rule define_celltype_markers_chromvar_chip_pseudobulk: 
+    input:
+        diff_results = expand(rules.parse_differential_chromvar_chip_celltypes_pseudobulk.output, motif_annotation="{motif_annotation}"),
+        script = config["scripts"]["define_markers_chromvar_chip"],
+    output:
+        all_markers = config["directories"]["results"]+"/atac/archR/chromvar_chip/pseudobulk_with_replicates/differential/celltypes/{motif_annotation}/parsed/markers_all.txt.gz",
+        filt_markers = config["directories"]["results"]+"/atac/archR/chromvar_chip/pseudobulk_with_replicates/differential/celltypes/{motif_annotation}/parsed/markers_filt.txt.gz"
+    params:
+        min_diff = config["define_markers_chromvar_chip"]["min_diff"],
+        min_score = config["define_markers_chromvar_chip"]["min_score"],
+        fdr = config["define_markers_chromvar_chip"]["fdr"],
+        outdir = config["directories"]["results"]+"/atac/archR/chromvar_chip/pseudobulk_with_replicates/differential/celltypes/{motif_annotation}/parsed"
+    log: 
+        "logs/define_celltype_markers_chromvar_chip_pseudobulk_{motif_annotation}.log"
+    threads: 
+        config["slurm"]["define_markers_chromvar_chip"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["define_markers_chromvar_chip"]["memory"]
+    shell:
+        "Rscript {input.script} --differential_results {input.diff_results} --min_score {params.min_score} --min_diff {params.min_diff} --fdr {params.fdr} --outdir {params.outdir} > {log}"
+
+##########
+## MOFA ##
+##########
+
+rule prepare_mofa:
+    input:
+        script = config["scripts"]["prepare_mofa"],
+        atac_feature_stats = config["resources"]["atac_feature_stats"],
+        atac_matrix_file = config["resources"]["atac_peak_matrix_cells"],
+        sce = config["resources"]["sce_rna_cells"],
+        metadata = config["resources"]["cell_metadata"]
+    output:
+        rna_mtx = config["directories"]["results"] + "/rna_atac/mofa/remove_ExE_cells_{remove_ExE_cells}/rna.mtx",
+        atac_mtx = config["directories"]["results"] + "/rna_atac/mofa/remove_ExE_cells_{remove_ExE_cells}/atac_tfidf.mtx",
+        rna_features = config["directories"]["results"] + "/rna_atac/mofa/remove_ExE_cells_{remove_ExE_cells}/rna_features.txt",
+        atac_features = config["directories"]["results"] + "/rna_atac/mofa/remove_ExE_cells_{remove_ExE_cells}/atac_features.txt",
+        cells = config["directories"]["results"] + "/rna_atac/mofa/remove_ExE_cells_{remove_ExE_cells}/cells.txt",
+        metadata = config["directories"]["results"] + "/rna_atac/mofa/remove_ExE_cells_{remove_ExE_cells}/sample_metadata.txt.gz"
+    params:
+        samples = config["reference_samples"],
+        nfeatures_atac = config["prepare_mofa"]["nfeatures_atac"],
+        nfeatures_rna = config["prepare_mofa"]["nfeatures_rna"],
+        outdir = config["directories"]["results"] + "/rna_atac/mofa/remove_ExE_cells_{remove_ExE_cells}"
+    threads: 
+        config["slurm"]["prepare_mofa"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["prepare_mofa"]["memory"]
+    log: 
+        "logs/prepare_mofa_remove_ExE_cells_{remove_ExE_cells}.log"
+    shell:
+        "Rscript {input.script} --metadata {input.metadata} --sce {input.sce} --atac_matrix_file {input.atac_matrix_file} --atac_matrix PeakMatrix --nfeatures_atac {params.nfeatures_atac} \
+        --atac_feature_stats {input.atac_feature_stats} --nfeatures_rna {params.nfeatures_rna} --samples {params.samples} --remove_ExE_cells {wildcards.remove_ExE_cells} --outdir {params.outdir} > {log}"
+
+rule run_mofa:
+    input:
+        rna_mtx = rules.prepare_mofa.output.rna_mtx,
+        atac_mtx = rules.prepare_mofa.output.atac_mtx,
+        rna_features = rules.prepare_mofa.output.rna_features,
+        atac_features = rules.prepare_mofa.output.atac_features,
+        cells = rules.prepare_mofa.output.cells,
+        script = config["scripts"]["run_mofa"]
+    output:
+        config["directories"]["results"] + "/rna_atac/mofa/remove_ExE_cells_{remove_ExE_cells}/mofa.hdf5"
+    params:
+        factors = config["run_mofa"]["factors"],
+        convergence_mode = config["run_mofa"]["convergence_mode"],
+        seed = config["run_mofa"]["seed"]
+    threads: 
+        config["slurm"]["run_mofa"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["run_mofa"]["memory"]
+    log: 
+        "logs/run_mofa_remove_ExE_cells{remove_ExE_cells}.log"
+    shell:
+        "python {input.script} --rna_matrix {input.rna_mtx} --atac_matrix {input.atac_mtx} --rna_features {input.rna_features} --atac_features {input.atac_features} --cells {input.cells} \
+          --factors {params.factors} --seed {params.seed} --convergence_mode {params.convergence_mode} --outfile {output} > {log}"
+
+rule run_mofa_fast:
+    input:
+        metadata = config["resources"]["cell_metadata"],
+        rna_dimred = config["resources"]["rna_dimred"],
+        atac_dimred = config["resources"]["atac_dimred"],
+        script = config["scripts"]["run_mofa_fast"]
+    output:
+        mofa_model = config["directories"]["results"] + "/rna_atac/mofa/fast/mofa.rds",
+        metadata = config["directories"]["results"] + "/rna_atac/mofa/fast/sample_metadata.txt.gz"
+    params:
+        factors = config["run_mofa"]["factors"],
+        outdir = config["directories"]["results"] + "/rna_atac/mofa/fast"
+    threads: 
+        config["slurm"]["run_mofa_fast"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["run_mofa_fast"]["memory"]
+    log: 
+        "logs/run_mofa_fast.log"
+    shell:
+        "Rscript {input.script} --metadata {input.metadata} --rna_dimred {input.rna_dimred} --atac_dimred {input.atac_dimred} --factors {params.factors} --outdir {params.outdir} > {log}"
+
+
+rule plot_mofa_results:
+    input:
+        metadata = rules.prepare_mofa.output.metadata,
+        mofa_model = rules.run_mofa.output,
+        script = config["scripts"]["plot_mofa_results"]
+    output:
+        config["directories"]["results"] + "/rna_atac/mofa/remove_ExE_cells_{remove_ExE_cells}/pdf/batch_correction_{mofa_batch_correction}/factors.txt.gz"
+    params:
+        outdir = config["directories"]["results"] + "/rna_atac/mofa/remove_ExE_cells_{remove_ExE_cells}/pdf/batch_correction_{mofa_batch_correction}"
+    threads: 
+        config["slurm"]["plot_mofa_results"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["plot_mofa_results"]["memory"]
+    log: 
+        "logs/plot_mofa_results_batch_correction_{remove_ExE_cells}_{mofa_batch_correction}.log"
+    shell:
+        "Rscript {input.script} --metadata {input.metadata} --mofa_model {input.mofa_model} --batch_correction {wildcards.mofa_batch_correction} --outdir {params.outdir} > {log}"
+
+rule plot_mofa_fast_results:
+    input:
+        metadata = rules.run_mofa_fast.output.metadata,
+        mofa_model = rules.run_mofa_fast.output.mofa_model,
+        script = config["scripts"]["plot_mofa_results"]
+    output:
+        config["directories"]["results"] + "/rna_atac/mofa/fast/pdf/batch_correction_{mofa_batch_correction}/factors.txt.gz"
+    params:
+        outdir = config["directories"]["results"] + "/rna_atac/mofa/fast/pdf/batch_correction_{mofa_batch_correction}"
+    threads: 
+        config["slurm"]["plot_mofa_results"]["threads"]
+    resources:
+        mem_mb = config["slurm"]["plot_mofa_results"]["memory"]
+    log: 
+        "logs/plot_mofa_results_batch_correction_{mofa_batch_correction}.log"
+    shell:
+        "Rscript {input.script} --metadata {input.metadata} --mofa_model {input.mofa_model} --batch_correction {wildcards.mofa_batch_correction} --outdir {params.outdir} > {log}"

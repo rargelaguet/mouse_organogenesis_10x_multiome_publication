@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Session genome="mm10" hasGeneTrack="true" hasSequenceTrack="true" locus="chr12:33362599-33435164" nextAutoscaleGroup="2" path="/Users/argelagr/gastrulation_multiome_10x/other/igv_settings/igv_session_babraham.xml" version="8">
+    <Resources>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Rostral_neurectoderm.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Neural_crest.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/NMP.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/ExE_endoderm.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Gut.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Somitic_mesoderm.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Cardiomyocytes.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Erythroid1.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Pharyngeal_mesoderm.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Paraxial_mesoderm.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Mesenchyme.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Haematoendothelial_progenitors.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Blood_progenitors_1.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Nascent_mesoderm.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Caudal_Mesoderm.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/ExE_ectoderm.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Parietal_endoderm.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Erythroid3.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Surface_ectoderm.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Intermediate_mesoderm.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Notochord.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Endothelium.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Blood_progenitors_2.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Epiblast.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Allantois.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Primitive_Streak.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/ExE_mesoderm.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Definitive_endoderm.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Erythroid2.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Spinal_cord.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Forebrain_Midbrain_Hindbrain.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Visceral_endoderm.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/GroupBigWigs/celltype/symbolic/Caudal_epiblast.bw"/>
+        <Resource path="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/PeakCalls/peaks_archR_macs2.bed.gz"/>
+        <Resource index="https://s3.amazonaws.com/igv.org.genomes/mm10/ncbiRefSeq.sorted.txt.gz.tbi" name="Refseq Genes" path="https://s3.amazonaws.com/igv.org.genomes/mm10/ncbiRefSeq.sorted.txt.gz" type="refgene"/>
+    </Resources>
+    <Panel height="858" name="DataPanel" width="1903">
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="99,85,71" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Epiblast.bw" name="Epiblast.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="218,190,153" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Primitive_Streak.bw" name="Primitive_Streak.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="158,103,98" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Caudal_epiblast.bw" name="Caudal_epiblast.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="15,74,156" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Notochord.bw" name="Notochord.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="243,151,192" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Definitive_endoderm.bw" name="Definitive_endoderm.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="239,90,157" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Gut.bw" name="Gut.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="197,148,191" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Nascent_mesoderm.bw" name="Nascent_mesoderm.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="19,153,146" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Intermediate_mesoderm.bw" name="Intermediate_mesoderm.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="63,132,170" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Caudal_Mesoderm.bw" name="Caudal_Mesoderm.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="141,181,206" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Paraxial_mesoderm.bw" name="Paraxial_mesoderm.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="0,85,121" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Somitic_mesoderm.bw" name="Somitic_mesoderm.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="201,235,251" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Pharyngeal_mesoderm.bw" name="Pharyngeal_mesoderm.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="181,29,141" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Cardiomyocytes.bw" name="Cardiomyocytes.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="83,44,138" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Allantois.bw" name="Allantois.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="136,112,173" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/ExE_mesoderm.bw" name="ExE_mesoderm.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="204,120,24" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Mesenchyme.bw" name="Mesenchyme.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="251,190,146" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Haematoendothelial_progenitors.bw" name="Haematoendothelial_progenitors.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="255,137,28" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Endothelium.bw" name="Endothelium.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="249,222,207" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Blood_progenitors_1.bw" name="Blood_progenitors_1.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="201,169,151" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Blood_progenitors_2.bw" name="Blood_progenitors_2.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="199,34,40" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Erythroid1.bw" name="Erythroid1.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="247,144,131" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Erythroid2.bw" name="Erythroid2.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="239,78,34" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Erythroid3.bw" name="Erythroid3.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="142,199,146" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/NMP.bw" name="NMP.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="101,168,62" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Rostral_neurectoderm.bw" name="Rostral_neurectoderm.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="195,195,136" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Neural_crest.bw" name="Neural_crest.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="100,122,79" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Forebrain_Midbrain_Hindbrain.bw" name="Forebrain_Midbrain_Hindbrain.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="205,224,136" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Spinal_cord.bw" name="Spinal_cord.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="247,247,158" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Surface_ectoderm.bw" name="Surface_ectoderm.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="246,191,203" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Visceral_endoderm.bw" name="Visceral_endoderm.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="127,104,116" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/ExE_endoderm.bw" name="ExE_endoderm.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="152,152,152" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/ExE_ectoderm.bw" name="ExE_ectoderm.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.DataSourceTrack" color="26,26,26" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="26" id="/Users/argelagr/data/gastrulation_multiome_10x/processed_new/atac/archR/GroupBigWigs/Parietal_endoderm.bw" name="Parietal_endoderm.bw" normalize="false" renderer="BAR_CHART" sortable="true" visible="true" windowFunction="mean">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="0.8" minimum="0.0" type="LINEAR"/>
+        </Track>
+    </Panel>
+    <Panel height="103" name="FeaturePanel" width="1903">
+<!--         <Track altColor="0,0,178" autoScale="false" color="0,0,178" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" id="Reference sequence" name="Reference sequence" sortable="false" visible="true"/> -->
+        <Track attributeKey="Reference sequence" clazz="org.broad.igv.track.SequenceTrack" fontSize="10" id="Reference sequence" name="Reference sequence" sequenceTranslationStrandValue="POSITIVE" shouldShowTranslation="false" visible="true"/>
+        <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.FeatureTrack" color="0,0,178" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" id="/Users/argelagr/data/gastrulation_multiome_10x/test/processed/atac/archR/PeakCalls/peaks_archR_macs2.bed.gz" name="ATAC_peaks" renderer="BASIC_FEATURE" sortable="false" visible="true" windowFunction="count"/>
+        <Track attributeKey="Refseq Genes" clazz="org.broad.igv.track.FeatureTrack" fontSize="10" groupByStrand="false" id="https://s3.amazonaws.com/igv.org.genomes/mm10/ncbiRefSeq.sorted.txt.gz" name="Refseq Genes" visible="true"/>
+<!--         <Track altColor="0,0,178" autoScale="false" clazz="org.broad.igv.track.FeatureTrack" color="0,0,178" colorScale="ContinuousColorScale;0.0;185.0;255,255,255;0,0,178" displayMode="COLLAPSED" featureVisibilityWindow="-1" fontSize="10" height="35" id="mm10_genes" name="Refseq genes" renderer="BASIC_FEATURE" sortable="false" visible="true" windowFunction="count">
+            <DataRange baseline="0.0" drawBaseline="true" flipAxis="false" maximum="185.0" minimum="0.0" type="LINEAR"/>
+        </Track> -->
+    </Panel>
+    <PanelLayout dividerFractions="0.8709677419354839"/>
+    <HiddenAttributes>
+        <Attribute name="DATA FILE"/>
+        <Attribute name="DATA TYPE"/>
+        <Attribute name="NAME"/>
+    </HiddenAttributes>
+</Session>
