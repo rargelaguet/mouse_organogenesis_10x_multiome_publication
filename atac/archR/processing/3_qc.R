@@ -245,7 +245,7 @@ to.plot <- sample_metadata %>%
   .[nFrags_atac<=150000 & TSSEnrichment_atac<=27] %>% # remove massive outliers for plotting
   .[,log_nFrags_atac:=log10(nFrags_atac)] %>%
   # melt(id.vars=c("sample","cell"), measure.vars=c("TSSEnrichment_atac","log_nFrags","BlacklistRatio_atac"))
-  melt(id.vars=c("sample","cell","sample","stage"), measure.vars=c("TSSEnrichment_atac","log_nFrags_atac"))
+  melt(id.vars=c("cell","sample","stage"), measure.vars=c("TSSEnrichment_atac","log_nFrags_atac"))
 
 facet.labels <- c("log_nFrags_atac" = "Num. of fragments (log10)", "TSSEnrichment_atac" = "TSS enrichment")
 
