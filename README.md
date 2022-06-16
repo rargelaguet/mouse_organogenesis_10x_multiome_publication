@@ -1,6 +1,6 @@
 # Decoding gene regulation in the mouse embryo using single-cell multi-omics
 
-This repository contains the scripts to reproduce the results of the manuscript [Decoding gene regulation in the mouse embryo using single-cell multi-omics](XXXX). 
+This repository contains the scripts to reproduce the results of the manuscript [Decoding gene regulation in the mouse embryo using single-cell multi-omics](https://www.biorxiv.org/content/10.1101/2022.06.15.496239v1). 
 
 
 Abstract
@@ -22,14 +22,14 @@ Snakemake pipeline
 -------
 We provide snakemake pipelines that can be used to reproduce many results. 
 * `/rna/snakemake`: snakemake pipeline for RNA expression
-* `/atac/ArchR`: snakemake pipeline for chromatin accessibility using ArchR
-* `/rna_atac`: snakemake pipeline to integrate RNA expression and chromatin accessibility results (MOFA, in silico ChIP-seq, etc.)
+* `/atac/ArchR/snakemake`: snakemake pipeline for chromatin accessibility using ArchR
+* `/rna_atac/snakemake`: snakemake pipeline to integrate RNA expression and chromatin accessibility results (MOFA, in silico ChIP-seq, etc.)
 
 Please note that the snakemake pipeline is rather complex and needs to be simplified and polished. It is currently useful to get an idea of the pipeline, but bare in mind that it  won't work straight away.
 
 IGV Genome browser session
 -------
-We provide a precomputed IGV Genome Browser Session [here](XXX) that can be used to interactively explore the ATAC-seq profiles, as shown in the screenshot below:
+We provide a precomputed IGV Genome Browser Session that can be used to interactively explore the ATAC-seq profiles, as shown in the screenshot below:
 
 <p align="center"> 
 <img src="images/igv_screenshot_github.png" width="650" height="350"/>
@@ -39,6 +39,8 @@ It can be downloaded running the following command line:
 ```
 wget ftp://ftpusr92:5FqIACU9@ftp1.babraham.ac.uk/igv_session_celltype.tar.gz
 ```
+
+Then load the file `igv_session.xml` using `File -> Open Session`.
 
 <!-- The following [videotutorial](XXX) shows how to download and load the IGV session -->
 
@@ -52,10 +54,10 @@ This precorded talk by Ricard Argelaguet presents an overview of the study. -->
 
 Directories
 -------
-* Mapping to the reference atlas (Figure S2): `/rna/mapping`
-* MOFA dimensionality reduction (Figure 1c): `/rna_atac/mofa`
-* Analysis of gene markers (Figure 1d-f): `/rna_atac/rna_vs_acc/pseudobulk/gene_markers_rna_vs_acc`
-* in silico ChIP-seq (Figure 2): `/rna_atac/virtual_chipseq_library`
+* Mapping to the reference atlas: `/rna/mapping`
+* MOFA dimensionality reduction: `/rna_atac/mofa`
+* Analysis of gene markers: `/rna_atac/rna_vs_acc/pseudobulk/gene_markers_rna_vs_acc`
+* in silico ChIP-seq: `/rna_atac/virtual_chipseq_library`
 * Metacell inference: `/rna/metacells/run`
 * Catalogue of TF activities per cell type (Figure 3): `/rna_atac/rna_vs_chromvar_chip/pseudobulk/per_celltype`
 * Gene regulatory network of NMP differentiation (Figure 4): `/rna_atac/gene_regulatory_networks/metacells/trajectories`
@@ -96,12 +98,13 @@ To download everything (~80GB):
 wget -r ftp://ftpusr92:5FqIACU9@ftp1.babraham.ac.uk/ .
 ```
 
-
 Twitter thread
 --------
-XXX
+We all know this is the most important day in the road towards a scientific publication:  
+
+[![Twitter URL](https://img.shields.io/twitter/url/https/twitter.com/bukotsunikki.svg?style=social)](https://twitter.com/RArgelaguet/status/1537146799772815366)
 
 Contact
 -------
-* Ricard Argelaguet (ricard.argelaguet@gmail.com), [![Twitter URL](https://img.shields.io/twitter/url/https/twitter.com/bukotsunikki.svg?style=social)](https://twitter.com/RArgelaguet)
+We have created a Slack group to discuss results, questions, collaborations, etc. related to the study. Feel free to drop by [using this link](https://join.slack.com/t/mouseembryo10-waq1273/shared_invite/zt-1aqhbmkhz-iSfgEAAUEu5~Aff2~NKADA). Alternatively, feel free to reach me via email at rargelaguet@altoslabs.com
 
