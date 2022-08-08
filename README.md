@@ -106,5 +106,5 @@ We all know this is the most important day in the road towards a scientific publ
 
 Contact
 -------
-We have created a Slack group to discuss results, questions, collaborations, etc. related to the study. Feel free to drop by [using this link](https://join.slack.com/t/mouseembryo10-waq1273/shared_invite/zt-1aqhbmkhz-iSfgEAAUEu5~Aff2~NKADA). Alternatively, feel free to reach me via email at rargelaguet@altoslabs.com
+We have created a Slack group to discuss results, questions, collaborations, etc. related to the study. Feel free to drop by [using this link](https://join.slack.com/t/mouseembryo10-waq1273/shared_invite/zt-1dxn064kk-garRxOLAhLOUFNZBwqzfqQ). Alternatively, feel free to reach me via email at rargelaguet@altoslabs.com
 
