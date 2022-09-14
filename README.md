@@ -44,9 +44,9 @@ Then load the file `igv_session.xml` using `File -> Open Session`.
 
 <!-- The following [videotutorial](XXX) shows how to download and load the IGV session -->
 
-Shiny app
+R Shiny app
 -------
-The shiny app is in preparation...
+The R shiny app for interactive data analaysis is available [here](https://www.bioinformatics.babraham.ac.uk/shiny/shiny_multiome_organogenesis/)
 
 <!-- Pre-recorded talk
 -------
@@ -93,10 +93,13 @@ To download a specific file:
 wget ftp://ftpusr92:5FqIACU9@ftp1.babraham.ac.uk/data/processed/rna/SingleCellExperiment.rds .
 ```
 
-To download everything (~80GB):
+To download everything (~60GB):
 ```
 wget -r ftp://ftpusr92:5FqIACU9@ftp1.babraham.ac.uk/ .
 ```
+
+If your download from the FTP server is slow, we also provide a temporary download via Dropbox [here](https://www.dropbox.com/sh/y4drtqi82vwl8vf/AAAsLcrye8jUTm1XPv7VNYhFa?dl=0)
+
 
 Twitter thread
 --------
